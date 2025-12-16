@@ -1,16 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
     View,
     Text,
     StyleSheet,
     FlatList,
+    TouchableOpacity,
+    Alert,
+    Modal,
+    TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { Card, Header, LoadingSpinner, EmptyState } from '../../components';
+import { Card, Header, LoadingSpinner, EmptyState, Button } from '../../components';
 import { ratingsApi } from '../../api';
 import { spacing, borderRadius } from '../../theme';
 import { Rating } from '../../types';
@@ -22,10 +26,17 @@ export function MyRatingsScreen() {
 
     const [loading, setLoading] = useState(true);
     const [ratings, setRatings] = useState<Rating[]>([]);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [editingRating, setEditingRating] = useState<any>(null);
+    const [editStars, setEditStars] = useState(5);
+    const [editReview, setEditReview] = useState('');
+    const [isSaving, setIsSaving] = useState(false);
 
-    useEffect(() => {
-        fetchRatings();
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            fetchRatings();
+        }, [])
+    );
 
     const fetchRatings = async () => {
         try {
@@ -38,16 +49,76 @@ export function MyRatingsScreen() {
         }
     };
 
-    const renderStars = (rating: number) => {
+    const handleEdit = (item: any) => {
+        setEditingRating(item);
+        setEditStars(item.rating);
+        setEditReview(item.review || '');
+        setShowEditModal(true);
+    };
+
+    const handleSaveEdit = async () => {
+        if (!editingRating) return;
+
+        setIsSaving(true);
+        try {
+            const ratingId = editingRating._id || editingRating.id;
+            await ratingsApi.updateRating(ratingId, {
+                rating: editStars,
+                review: editReview.trim() || undefined,
+            });
+            Alert.alert('Success', 'Rating updated successfully');
+            setShowEditModal(false);
+            fetchRatings();
+        } catch (error: any) {
+            console.error('Update rating error:', error.response?.data || error);
+            const message = error.response?.data?.error || 'Failed to update rating';
+            Alert.alert('Error', message);
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const handleDelete = (item: any) => {
+        const ratingId = item._id || item.id;
+        Alert.alert(
+            'Delete Rating',
+            'Are you sure you want to delete this rating?',
+            [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                    text: 'Delete',
+                    style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            await ratingsApi.deleteRating(ratingId);
+                            Alert.alert('Success', 'Rating deleted successfully');
+                            fetchRatings();
+                        } catch (error: any) {
+                            console.error('Delete rating error:', error.response?.data || error);
+                            const message = error.response?.data?.error || 'Failed to delete rating';
+                            Alert.alert('Error', message);
+                        }
+                    },
+                },
+            ]
+        );
+    };
+
+    const renderStars = (rating: number, interactive = false, onPress?: (star: number) => void) => {
         return (
             <View style={styles.starsRow}>
                 {[1, 2, 3, 4, 5].map((star) => (
-                    <Ionicons
+                    <TouchableOpacity
                         key={star}
-                        name={star <= rating ? 'star' : 'star-outline'}
-                        size={16}
-                        color={star <= rating ? colors.warning : colors.textMuted}
-                    />
+                        onPress={() => interactive && onPress?.(star)}
+                        disabled={!interactive}
+                    >
+                        <Ionicons
+                            name={star <= rating ? 'star' : 'star-outline'}
+                            size={interactive ? 32 : 16}
+                            color={star <= rating ? colors.warning : colors.textMuted}
+                        />
+                    </TouchableOpacity>
                 ))}
             </View>
         );
@@ -70,6 +141,20 @@ export function MyRatingsScreen() {
                         <Text style={[styles.specialization, { color: colors.textSecondary }]}>
                             {doctor.specializations?.join(', ') || 'Doctor'}
                         </Text>
+                    </View>
+                    <View style={styles.actionButtons}>
+                        <TouchableOpacity
+                            style={[styles.actionBtn, { backgroundColor: colors.primary + '20' }]}
+                            onPress={() => handleEdit(item)}
+                        >
+                            <Ionicons name="pencil" size={16} color={colors.primary} />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[styles.actionBtn, { backgroundColor: colors.error + '20' }]}
+                            onPress={() => handleDelete(item)}
+                        >
+                            <Ionicons name="trash" size={16} color={colors.error} />
+                        </TouchableOpacity>
                     </View>
                 </View>
 
@@ -116,6 +201,64 @@ export function MyRatingsScreen() {
                     showsVerticalScrollIndicator={false}
                 />
             )}
+
+            {/* Edit Rating Modal */}
+            <Modal
+                visible={showEditModal}
+                transparent
+                animationType="slide"
+                onRequestClose={() => setShowEditModal(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+                        <View style={styles.modalHeader}>
+                            <Text style={[styles.modalTitle, { color: colors.text }]}>
+                                Edit Rating
+                            </Text>
+                            <TouchableOpacity onPress={() => setShowEditModal(false)}>
+                                <Ionicons name="close" size={24} color={colors.text} />
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.modalBody}>
+                            <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>
+                                Your Rating
+                            </Text>
+                            <View style={styles.starsContainer}>
+                                {renderStars(editStars, true, setEditStars)}
+                            </View>
+
+                            <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>
+                                Your Review (Optional)
+                            </Text>
+                            <TextInput
+                                style={[styles.textInput, styles.reviewInput, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
+                                placeholder="Write your review..."
+                                placeholderTextColor={colors.textMuted}
+                                value={editReview}
+                                onChangeText={setEditReview}
+                                multiline
+                                numberOfLines={4}
+                            />
+                        </View>
+
+                        <View style={styles.modalActions}>
+                            <Button
+                                title="Cancel"
+                                onPress={() => setShowEditModal(false)}
+                                variant="outline"
+                                style={{ flex: 1, marginRight: spacing.sm }}
+                            />
+                            <Button
+                                title={isSaving ? "Saving..." : "Save Changes"}
+                                onPress={handleSaveEdit}
+                                disabled={isSaving}
+                                style={{ flex: 1, marginLeft: spacing.sm }}
+                            />
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </SafeAreaView>
     );
 }
@@ -160,6 +303,14 @@ const styles = StyleSheet.create({
         fontSize: 13,
         marginTop: 2,
     },
+    actionButtons: {
+        flexDirection: 'row',
+        gap: spacing.xs,
+    },
+    actionBtn: {
+        padding: spacing.sm,
+        borderRadius: borderRadius.md,
+    },
     ratingContent: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -170,6 +321,10 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         gap: 2,
     },
+    starsContainer: {
+        alignItems: 'center',
+        paddingVertical: spacing.md,
+    },
     ratingDate: {
         fontSize: 12,
     },
@@ -177,5 +332,49 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontStyle: 'italic',
         lineHeight: 20,
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: spacing.lg,
+    },
+    modalContent: {
+        width: '100%',
+        maxWidth: 400,
+        borderRadius: borderRadius.lg,
+        padding: spacing.lg,
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: spacing.lg,
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+    },
+    modalBody: {
+        marginBottom: spacing.lg,
+    },
+    inputLabel: {
+        fontSize: 14,
+        marginBottom: spacing.xs,
+        marginTop: spacing.sm,
+    },
+    textInput: {
+        borderWidth: 1,
+        borderRadius: borderRadius.md,
+        padding: spacing.md,
+        fontSize: 16,
+    },
+    reviewInput: {
+        minHeight: 100,
+        textAlignVertical: 'top',
+    },
+    modalActions: {
+        flexDirection: 'row',
     },
 });

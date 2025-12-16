@@ -32,4 +32,22 @@ export const ratingsApi = {
         const response = await apiClient.get('/api/ratings?myRatings=true');
         return { ratings: response.data.data || [] };
     },
+
+    // Update an existing rating - PATCH /api/ratings with ratingId in body
+    updateRating: async (ratingId: string, data: {
+        rating: number;
+        review?: string;
+    }): Promise<{ success: boolean }> => {
+        const response = await apiClient.patch('/api/ratings', {
+            ratingId,
+            ...data
+        });
+        return { success: response.data.success };
+    },
+
+    // Delete a rating - DELETE /api/ratings?ratingId=xxx
+    deleteRating: async (ratingId: string): Promise<{ success: boolean }> => {
+        const response = await apiClient.delete(`/api/ratings?ratingId=${ratingId}`);
+        return { success: response.data.success };
+    },
 };
