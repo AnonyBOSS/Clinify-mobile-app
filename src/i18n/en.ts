@@ -40,6 +40,7 @@ export const en = {
         emailRequired: 'Email is required',
         passwordRequired: 'Password is required',
         passwordMismatch: 'Passwords do not match',
+        registerFailed: 'Registration failed',
     },
 
     // Navigation
@@ -52,7 +53,6 @@ export const en = {
         schedule: 'Schedule',
     },
 
-    // Dashboard
     dashboard: {
         welcome: 'Welcome',
         todayAppointments: "Today's Appointments",
@@ -63,6 +63,18 @@ export const en = {
         symptomChecker: 'Symptom Checker',
         aiAssistant: 'AI Assistant',
         viewAll: 'View All',
+        rated: 'Rated',
+        rateDoctor: 'Rate Doctor',
+        total: 'Total',
+        completed: 'Completed',
+        upcoming: 'Upcoming',
+        totalRevenue: 'Total Revenue',
+        availableSlots: 'Available Slots',
+        openSlotsBooking: 'open slots for booking',
+        next7Days: 'Next 7 Days',
+        noUpcomingAppointments: 'No upcoming appointments',
+        popularHours: 'Popular Hours',
+        rating: 'Rating',
     },
 
     // Appointments
@@ -90,6 +102,7 @@ export const en = {
         bookingSuccess: 'Appointment booked successfully!',
         cancelSuccess: 'Appointment cancelled successfully',
         cancelConfirm: 'Are you sure you want to cancel this appointment?',
+        selectSlotRequired: 'Please select a time slot',
     },
 
     // Doctors
@@ -106,6 +119,8 @@ export const en = {
         qualifications: 'Qualifications',
         experience: 'Experience',
         about: 'About',
+        tryAdjusting: 'Try adjusting your search or filters',
+        all: 'All',
     },
 
     // Messages
@@ -129,7 +144,6 @@ export const en = {
         rating: 'Rating',
     },
 
-    // Profile
     profile: {
         title: 'Profile',
         editProfile: 'Edit Profile',
@@ -150,9 +164,29 @@ export const en = {
         darkMode: 'Dark Mode',
         updateSuccess: 'Profile updated successfully',
         passwordSuccess: 'Password changed successfully',
+        fillAllFields: 'Please fill in all fields',
+        passwordsDoNotMatch: 'New passwords do not match',
+        passwordTooShort: 'New password must be at least 6 characters',
+        nameRequired: 'Name cannot be empty',
+        myRatings: 'My Ratings',
+        support: 'Support',
+        helpCenter: 'Help Center',
+        privacyPolicy: 'Privacy Policy',
+        termsOfService: 'Terms of Service',
+        confirmPasswordLabel: 'Confirm New Password',
+        enterCurrentPassword: 'Enter current password',
+        enterNewPassword: 'Enter new password',
+        confirmNewPassword: 'Confirm new password',
+        enterName: 'Enter your full name',
+        enterPhone: 'Enter your phone number',
+        changing: 'Changing...',
+        saving: 'Saving..',
+        saveChanges: 'Save Changes',
+        logoutConfirm: 'Are you sure you want to logout?',
+        failedChangePass: 'Failed to change password',
+        failedUpdateProfile: 'Failed to update profile',
     },
 
-    // Schedule (Doctor)
     schedule: {
         title: 'Schedule Management',
         workingDays: 'Working Days',
@@ -167,6 +201,22 @@ export const en = {
         generateSlots: 'Generate Slots',
         slotsGenerated: 'Slots generated successfully',
         noSchedule: 'No schedule configured',
+        saveSchedule: 'Save Schedule',
+        consultationFee: 'Consultation Fee',
+        consultationFeeDesc: 'This fee will be used for all appointments booked with you.',
+        active: 'Active',
+        removeRow: 'Remove',
+        selectClinic: 'Select Clinic',
+        selectRoom: 'Select Room',
+        scheduleUpdated: 'Schedule saved successfully',
+        generateSlotsFor2Weeks: 'Generate Slots for 2 Weeks',
+        noScheduleYet: 'No schedule rows yet. Add one to start defining your working hours.',
+        slotMin: 'Slot (min)',
+        failedToLoad: 'Failed to load schedule',
+        startBeforeEnd: 'Start time must be before end time',
+        feeInvalid: 'Consultation fee must be a non-negative number',
+        failedToSave: 'Failed to save schedule',
+        failedToGenerate: 'Failed to generate slots',
         days: {
             sunday: 'Sunday',
             monday: 'Monday',
@@ -178,7 +228,6 @@ export const en = {
         },
     },
 
-    // Ratings
     ratings: {
         rateDoctor: 'Rate Doctor',
         yourRating: 'Your Rating',
@@ -186,9 +235,32 @@ export const en = {
         submitRating: 'Submit Rating',
         ratingSuccess: 'Rating submitted successfully',
         thankYou: 'Thank you for your feedback!',
+        ratingRequired: 'Please select a star rating',
+        updateSuccess: 'Rating updated successfully',
+        deleteSuccess: 'Rating deleted successfully',
+        rateYourVisit: 'Rate Your Visit',
+        howWasExperience: 'How was your experience?',
+        tapToRate: 'Tap to rate',
+        poor: 'Poor',
+        fair: 'Fair',
+        good: 'Good',
+        veryGood: 'Very Good',
+        excellent: 'Excellent',
+        shareExperience: 'Share your experience (optional)',
+        submitting: 'Submitting...',
+        editRating: 'Edit Rating',
+        yourReview: 'Your Review (Optional)',
+        writeYourReview: 'Write your review...',
+        noRatingsYet: 'No Ratings Yet',
+        ratingsAppearHere: 'Your ratings will appear here after you rate doctors.',
+        loadingRatings: 'Loading ratings...',
+        deleteRating: 'Delete Rating',
+        confirmDelete: 'Are you sure you want to delete this rating?',
+        failedUpdate: 'Failed to update rating',
+        failedDelete: 'Failed to delete rating',
+        failedSubmit: 'Failed to submit rating. Please try again.',
     },
 
-    // AI Features
     ai: {
         symptomChecker: 'Symptom Checker',
         describeSymptoms: 'Describe your symptoms',
@@ -201,6 +273,20 @@ export const en = {
         medicalAssistant: 'AI Medical Assistant',
         askQuestion: 'Ask a health question...',
         disclaimer: 'This AI assistant provides general health information only. Always consult a healthcare professional for medical advice.',
+        pleaseDescribe: 'Please describe your symptoms',
+        failedToAnalyze: 'Failed to analyze symptoms. Please try again.',
+        summary: 'Summary',
+        possibleConditions: 'Possible Conditions',
+        detailedAnalysis: 'Detailed Analysis',
+        selfCareAdvice: 'Self Care Advice',
+        warningSignsToWatch: 'Warning Signs to Watch',
+        findDoctors: 'Find Doctors',
+        quickQuestions: 'Quick Questions',
+        aiError: 'Sorry, I encountered an error. Please try again.',
+        q1: 'What are common cold symptoms?',
+        q2: 'How to reduce fever naturally?',
+        q3: 'When should I see a doctor?',
+        q4: 'Tips for better sleep',
     },
 
     // Errors

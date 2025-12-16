@@ -87,7 +87,7 @@ export function BookingScreen() {
 
     const handleBooking = async () => {
         if (!selectedSlot) {
-            Alert.alert('Error', 'Please select a time slot');
+            Alert.alert(t('common.error'), t('appointments.selectSlotRequired'));
             return;
         }
 
@@ -103,12 +103,12 @@ export function BookingScreen() {
                 method: paymentMethod.toUpperCase() as 'CASH' | 'CARD',
                 notes,
             });
-            Alert.alert('Success', t('appointments.bookingSuccess'), [
-                { text: 'OK', onPress: () => navigation.goBack() },
+            Alert.alert(t('common.done'), t('appointments.bookingSuccess'), [
+                { text: t('common.done'), onPress: () => navigation.goBack() },
             ]);
         } catch (error: any) {
-            const message = error.response?.data?.error || error.response?.data?.message || 'Booking failed';
-            Alert.alert('Error', message);
+            const message = error.response?.data?.error || error.response?.data?.message || t('appointments.book');
+            Alert.alert(t('common.error'), message);
         } finally {
             setBooking(false);
         }
@@ -134,7 +134,7 @@ export function BookingScreen() {
                                 Dr. {doctorName}
                             </Text>
                             <Text style={[styles.consultFee, { color: colors.textSecondary }]}>
-                                Consultation Fee: ${consultationFee}
+                                {t('doctors.consultationFee')}: ${consultationFee}
                             </Text>
                         </View>
                     </View>

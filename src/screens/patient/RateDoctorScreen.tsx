@@ -37,7 +37,7 @@ export function RateDoctorScreen() {
 
     const handleSubmit = async () => {
         if (rating === 0) {
-            Alert.alert('Rating Required', 'Please select a star rating');
+            Alert.alert(t('ratings.ratingRequired'), t('ratings.ratingRequired'));
             return;
         }
 
@@ -49,13 +49,13 @@ export function RateDoctorScreen() {
                 review: review.trim() || undefined,
             });
             Alert.alert(
-                'Thank You!',
-                'Your rating has been submitted successfully.',
-                [{ text: 'OK', onPress: () => navigation.goBack() }]
+                t('ratings.thankYou'),
+                t('ratings.ratingSuccess'),
+                [{ text: t('common.done'), onPress: () => navigation.goBack() }]
             );
         } catch (error: any) {
-            const message = error.response?.data?.error || 'Failed to submit rating. Please try again.';
-            Alert.alert('Error', message);
+            const message = error.response?.data?.error || t('ratings.failedSubmit');
+            Alert.alert(t('common.error'), message);
         } finally {
             setSubmitting(false);
         }
@@ -88,7 +88,7 @@ export function RateDoctorScreen() {
                     <Ionicons name="arrow-back" size={24} color={colors.text} />
                 </TouchableOpacity>
                 <Text style={[styles.headerTitle, { color: colors.text }]}>
-                    Rate Your Visit
+                    {t('ratings.rateYourVisit')}
                 </Text>
                 <View style={{ width: 24 }} />
             </View>
@@ -107,18 +107,18 @@ export function RateDoctorScreen() {
                     </View>
 
                     <Text style={[styles.prompt, { color: colors.textSecondary }]}>
-                        How was your experience?
+                        {t('ratings.howWasExperience')}
                     </Text>
 
                     {renderStars()}
 
                     <Text style={[styles.ratingLabel, { color: colors.text }]}>
-                        {rating === 0 && 'Tap to rate'}
-                        {rating === 1 && 'Poor'}
-                        {rating === 2 && 'Fair'}
-                        {rating === 3 && 'Good'}
-                        {rating === 4 && 'Very Good'}
-                        {rating === 5 && 'Excellent'}
+                        {rating === 0 && t('ratings.tapToRate')}
+                        {rating === 1 && t('ratings.poor')}
+                        {rating === 2 && t('ratings.fair')}
+                        {rating === 3 && t('ratings.good')}
+                        {rating === 4 && t('ratings.veryGood')}
+                        {rating === 5 && t('ratings.excellent')}
                     </Text>
 
                     <TextInput
@@ -130,7 +130,7 @@ export function RateDoctorScreen() {
                                 borderColor: colors.border,
                             }
                         ]}
-                        placeholder="Share your experience (optional)"
+                        placeholder={t('ratings.shareExperience')}
                         placeholderTextColor={colors.textMuted}
                         multiline
                         numberOfLines={4}
@@ -140,7 +140,7 @@ export function RateDoctorScreen() {
                     />
 
                     <Button
-                        title={submitting ? 'Submitting...' : 'Submit Rating'}
+                        title={submitting ? t('ratings.submitting') : t('ratings.submitRating')}
                         onPress={handleSubmit}
                         disabled={submitting || rating === 0}
                         variant="primary"

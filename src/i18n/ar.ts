@@ -40,6 +40,7 @@ export const ar = {
         emailRequired: 'البريد الإلكتروني مطلوب',
         passwordRequired: 'كلمة المرور مطلوبة',
         passwordMismatch: 'كلمات المرور غير متطابقة',
+        registerFailed: 'فشل التسجيل',
     },
 
     // Navigation
@@ -52,7 +53,6 @@ export const ar = {
         schedule: 'الجدول',
     },
 
-    // Dashboard
     dashboard: {
         welcome: 'مرحباً',
         todayAppointments: 'مواعيد اليوم',
@@ -63,6 +63,18 @@ export const ar = {
         symptomChecker: 'فحص الأعراض',
         aiAssistant: 'المساعد الذكي',
         viewAll: 'عرض الكل',
+        rated: 'تم التقييم',
+        rateDoctor: 'قيم الطبيب',
+        total: 'الإجمالي',
+        completed: 'مكتمل',
+        upcoming: 'قادم',
+        totalRevenue: 'إجمالي الإيرادات',
+        availableSlots: 'الفترات المتاحة',
+        openSlotsBooking: 'فترات مفتوحة للحجز',
+        next7Days: 'الأيام السبعة القادمة',
+        noUpcomingAppointments: 'لا توجد مواعيد قادمة',
+        popularHours: 'الساعات الشائعة',
+        rating: 'التقييم',
     },
 
     // Appointments
@@ -90,6 +102,7 @@ export const ar = {
         bookingSuccess: 'تم حجز الموعد بنجاح!',
         cancelSuccess: 'تم إلغاء الموعد بنجاح',
         cancelConfirm: 'هل أنت متأكد من إلغاء هذا الموعد؟',
+        selectSlotRequired: 'يرجى اختيار موعد',
     },
 
     // Doctors
@@ -106,6 +119,8 @@ export const ar = {
         qualifications: 'المؤهلات',
         experience: 'الخبرة',
         about: 'نبذة',
+        tryAdjusting: 'حاول تعديل البحث أو الفلاتر',
+        all: 'الكل',
     },
 
     // Messages
@@ -129,7 +144,6 @@ export const ar = {
         rating: 'تقييم',
     },
 
-    // Profile
     profile: {
         title: 'الملف الشخصي',
         editProfile: 'تعديل الملف',
@@ -150,9 +164,29 @@ export const ar = {
         darkMode: 'الوضع الداكن',
         updateSuccess: 'تم تحديث الملف بنجاح',
         passwordSuccess: 'تم تغيير كلمة المرور بنجاح',
+        fillAllFields: 'يرجى ملء جميع الحقول',
+        passwordsDoNotMatch: 'كلمات المرور الجديدة غير متطابقة',
+        passwordTooShort: 'يجب أن تكون كلمة المرور الجديدة 6 أحرف على الأقل',
+        nameRequired: 'الاسم لا يمكن أن يكون فارغاً',
+        myRatings: 'تقييماتي',
+        support: 'الدعم',
+        helpCenter: 'مركز المساعدة',
+        privacyPolicy: 'سياسة الخصوصية',
+        termsOfService: 'شروط الخدمة',
+        confirmPasswordLabel: 'تأكيد كلمة المرور الجديدة',
+        enterCurrentPassword: 'أدخل كلمة المرور الحالية',
+        enterNewPassword: 'أدخل كلمة المرور الجديدة',
+        confirmNewPassword: 'تأكيد كلمة المرور الجديدة',
+        enterName: 'أدخل اسمك الكامل',
+        enterPhone: 'أدخل رقم هاتفك',
+        changing: 'جاري التغيير...',
+        saving: 'جاري الحفظ...',
+        saveChanges: 'حفظ التغييرات',
+        logoutConfirm: 'هل أنت متأكد من تسجيل الخروج؟',
+        failedChangePass: 'فشل في تغيير كلمة المرور',
+        failedUpdateProfile: 'فشل في تحديث الملف الشخصي',
     },
 
-    // Schedule (Doctor)
     schedule: {
         title: 'إدارة الجدول',
         workingDays: 'أيام العمل',
@@ -167,6 +201,22 @@ export const ar = {
         generateSlots: 'إنشاء المواعيد',
         slotsGenerated: 'تم إنشاء المواعيد بنجاح',
         noSchedule: 'لا يوجد جدول محدد',
+        saveSchedule: 'حفظ الجدول',
+        consultationFee: 'رسوم الاستشارة',
+        consultationFeeDesc: 'سيتم استخدام هذه الرسوم لجميع المواعيد المحجوزة معك.',
+        active: 'نشط',
+        removeRow: 'إزالة',
+        selectClinic: 'اختر العيادة',
+        selectRoom: 'اختر الغرفة',
+        scheduleUpdated: 'تم حفظ الجدول بنجاح',
+        generateSlotsFor2Weeks: 'إنشاء مواعيد لأسبوعين',
+        noScheduleYet: 'لا توجد صفوف جدول بعد. أضف واحداً لتحديد ساعات عملك.',
+        slotMin: 'المدة (د)',
+        failedToLoad: 'فشل في تحميل الجدول',
+        startBeforeEnd: 'يجب أن يكون وقت البداية قبل وقت النهاية',
+        feeInvalid: 'يجب أن تكون رسوم الاستشارة رقماً غير سالب',
+        failedToSave: 'فشل في حفظ الجدول',
+        failedToGenerate: 'فشل في إنشاء المواعيد',
         days: {
             sunday: 'الأحد',
             monday: 'الاثنين',
@@ -178,7 +228,6 @@ export const ar = {
         },
     },
 
-    // Ratings
     ratings: {
         rateDoctor: 'تقييم الطبيب',
         yourRating: 'تقييمك',
@@ -186,9 +235,32 @@ export const ar = {
         submitRating: 'إرسال التقييم',
         ratingSuccess: 'تم إرسال التقييم بنجاح',
         thankYou: 'شكراً لملاحظاتك!',
+        ratingRequired: 'يرجى اختيار تقييم بالنجوم',
+        updateSuccess: 'تم تحديث التقييم بنجاح',
+        deleteSuccess: 'تم حذف التقييم بنجاح',
+        rateYourVisit: 'قيم زيارتك',
+        howWasExperience: 'كيف كانت تجربتك؟',
+        tapToRate: 'اضغط للتقييم',
+        poor: 'سيئ',
+        fair: 'مقبول',
+        good: 'جيد',
+        veryGood: 'جيد جداً',
+        excellent: 'ممتاز',
+        shareExperience: 'شارك تجربتك (اختياري)',
+        submitting: 'جاري الإرسال...',
+        editRating: 'تعديل التقييم',
+        yourReview: 'مراجعتك (اختياري)',
+        writeYourReview: 'اكتب مراجعتك...',
+        noRatingsYet: 'لا توجد تقييمات بعد',
+        ratingsAppearHere: 'ستظهر تقييماتك هنا بعد تقييم الأطباء.',
+        loadingRatings: 'جاري تحميل التقييمات...',
+        deleteRating: 'حذف التقييم',
+        confirmDelete: 'هل أنت متأكد من حذف هذا التقييم؟',
+        failedUpdate: 'فشل في تحديث التقييم',
+        failedDelete: 'فشل في حذف التقييم',
+        failedSubmit: 'فشل في إرسال التقييم. يرجى المحاولة مرة أخرى.',
     },
 
-    // AI Features
     ai: {
         symptomChecker: 'فحص الأعراض',
         describeSymptoms: 'صف أعراضك',
@@ -201,6 +273,20 @@ export const ar = {
         medicalAssistant: 'المساعد الطبي الذكي',
         askQuestion: 'اسأل سؤالاً صحياً...',
         disclaimer: 'هذا المساعد الذكي يوفر معلومات صحية عامة فقط. استشر دائماً أخصائي رعاية صحية للحصول على نصيحة طبية.',
+        pleaseDescribe: 'يرجى وصف أعراضك',
+        failedToAnalyze: 'فشل في تحليل الأعراض. يرجى المحاولة مرة أخرى.',
+        summary: 'ملخص',
+        possibleConditions: 'الحالات المحتملة',
+        detailedAnalysis: 'التحليل المفصل',
+        selfCareAdvice: 'نصائح العناية الذاتية',
+        warningSignsToWatch: 'علامات تحذيرية للمراقبة',
+        findDoctors: 'ابحث عن أطباء',
+        quickQuestions: 'أسئلة سريعة',
+        aiError: 'عذراً، حدث خطأ. يرجى المحاولة مرة أخرى.',
+        q1: 'ما هي أعراض البرد الشائعة؟',
+        q2: 'كيف أخفض الحمى طبيعياً؟',
+        q3: 'متى يجب زيارة الطبيب؟',
+        q4: 'نصائح لنوم أفضل',
     },
 
     // Errors

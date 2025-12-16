@@ -66,12 +66,12 @@ export function MyRatingsScreen() {
                 rating: editStars,
                 review: editReview.trim() || undefined,
             });
-            Alert.alert('Success', 'Rating updated successfully');
+            Alert.alert(t('common.done'), t('ratings.updateSuccess'));
             setShowEditModal(false);
             fetchRatings();
         } catch (error: any) {
-            const message = error.response?.data?.error || 'Failed to update rating';
-            Alert.alert('Error', message);
+            const message = error.response?.data?.error || t('ratings.failedUpdate');
+            Alert.alert(t('common.error'), message);
         } finally {
             setIsSaving(false);
         }
@@ -80,21 +80,21 @@ export function MyRatingsScreen() {
     const handleDelete = (item: any) => {
         const ratingId = item._id || item.id;
         Alert.alert(
-            'Delete Rating',
-            'Are you sure you want to delete this rating?',
+            t('ratings.deleteRating'),
+            t('ratings.confirmDelete'),
             [
-                { text: 'Cancel', style: 'cancel' },
+                { text: t('common.cancel'), style: 'cancel' },
                 {
-                    text: 'Delete',
+                    text: t('common.delete'),
                     style: 'destructive',
                     onPress: async () => {
                         try {
                             await ratingsApi.deleteRating(ratingId);
-                            Alert.alert('Success', 'Rating deleted successfully');
+                            Alert.alert(t('common.done'), t('ratings.deleteSuccess'));
                             fetchRatings();
                         } catch (error: any) {
-                            const message = error.response?.data?.error || 'Failed to delete rating';
-                            Alert.alert('Error', message);
+                            const message = error.response?.data?.error || t('ratings.failedDelete');
+                            Alert.alert(t('common.error'), message);
                         }
                     },
                 },
@@ -173,13 +173,13 @@ export function MyRatingsScreen() {
     };
 
     if (loading) {
-        return <LoadingSpinner fullScreen message="Loading ratings..." />;
+        return <LoadingSpinner fullScreen message={t('ratings.loadingRatings')} />;
     }
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
             <Header
-                title="My Ratings"
+                title={t('profile.myRatings')}
                 showBack
                 onBack={() => navigation.goBack()}
             />
@@ -187,8 +187,8 @@ export function MyRatingsScreen() {
             {ratings.length === 0 ? (
                 <EmptyState
                     icon="star-outline"
-                    title="No Ratings Yet"
-                    message="Your ratings will appear here after you rate doctors."
+                    title={t('ratings.noRatingsYet')}
+                    message={t('ratings.ratingsAppearHere')}
                 />
             ) : (
                 <FlatList
@@ -211,7 +211,7 @@ export function MyRatingsScreen() {
                     <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
                         <View style={styles.modalHeader}>
                             <Text style={[styles.modalTitle, { color: colors.text }]}>
-                                Edit Rating
+                                {t('ratings.editRating')}
                             </Text>
                             <TouchableOpacity onPress={() => setShowEditModal(false)}>
                                 <Ionicons name="close" size={24} color={colors.text} />
@@ -220,18 +220,18 @@ export function MyRatingsScreen() {
 
                         <View style={styles.modalBody}>
                             <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>
-                                Your Rating
+                                {t('ratings.yourRating')}
                             </Text>
                             <View style={styles.starsContainer}>
                                 {renderStars(editStars, true, setEditStars)}
                             </View>
 
                             <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>
-                                Your Review (Optional)
+                                {t('ratings.yourReview')}
                             </Text>
                             <TextInput
                                 style={[styles.textInput, styles.reviewInput, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
-                                placeholder="Write your review..."
+                                placeholder={t('ratings.writeYourReview')}
                                 placeholderTextColor={colors.textMuted}
                                 value={editReview}
                                 onChangeText={setEditReview}
@@ -242,13 +242,13 @@ export function MyRatingsScreen() {
 
                         <View style={styles.modalActions}>
                             <Button
-                                title="Cancel"
+                                title={t('common.cancel')}
                                 onPress={() => setShowEditModal(false)}
                                 variant="outline"
                                 style={{ flex: 1, marginRight: spacing.sm }}
                             />
                             <Button
-                                title={isSaving ? "Saving..." : "Save Changes"}
+                                title={isSaving ? t('profile.saving') : t('profile.saveChanges')}
                                 onPress={handleSaveEdit}
                                 disabled={isSaving}
                                 style={{ flex: 1, marginLeft: spacing.sm }}

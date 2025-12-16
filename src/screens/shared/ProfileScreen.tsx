@@ -39,15 +39,15 @@ export function ProfileScreen() {
 
     const handleChangePassword = async () => {
         if (!currentPassword || !newPassword || !confirmPassword) {
-            Alert.alert('Error', 'Please fill in all fields');
+            Alert.alert(t('common.error'), t('profile.fillAllFields'));
             return;
         }
         if (newPassword !== confirmPassword) {
-            Alert.alert('Error', 'New passwords do not match');
+            Alert.alert(t('common.error'), t('profile.passwordsDoNotMatch'));
             return;
         }
         if (newPassword.length < 6) {
-            Alert.alert('Error', 'New password must be at least 6 characters');
+            Alert.alert(t('common.error'), t('profile.passwordTooShort'));
             return;
         }
 
@@ -57,14 +57,14 @@ export function ProfileScreen() {
                 currentPassword,
                 newPassword,
             });
-            Alert.alert('Success', 'Password changed successfully');
+            Alert.alert(t('common.done'), t('profile.passwordSuccess'));
             setShowPasswordModal(false);
             setCurrentPassword('');
             setNewPassword('');
             setConfirmPassword('');
         } catch (error: any) {
-            const message = error.response?.data?.error || error.response?.data?.message || 'Failed to change password';
-            Alert.alert('Error', message);
+            const message = error.response?.data?.error || error.response?.data?.message || t('profile.failedChangePass');
+            Alert.alert(t('common.error'), message);
         } finally {
             setIsChangingPassword(false);
         }
@@ -72,7 +72,7 @@ export function ProfileScreen() {
 
     const handleSaveProfile = async () => {
         if (!editName.trim()) {
-            Alert.alert('Error', 'Name cannot be empty');
+            Alert.alert(t('common.error'), t('profile.nameRequired'));
             return;
         }
 
@@ -86,11 +86,11 @@ export function ProfileScreen() {
             if (refreshUser) {
                 await refreshUser();
             }
-            Alert.alert('Success', 'Profile updated successfully');
+            Alert.alert(t('common.done'), t('profile.updateSuccess'));
             setShowEditProfileModal(false);
         } catch (error: any) {
-            const message = error.response?.data?.error || error.response?.data?.message || 'Failed to update profile';
-            Alert.alert('Error', message);
+            const message = error.response?.data?.error || error.response?.data?.message || t('profile.failedUpdateProfile');
+            Alert.alert(t('common.error'), message);
         } finally {
             setIsSavingProfile(false);
         }
@@ -99,7 +99,7 @@ export function ProfileScreen() {
     const handleLogout = () => {
         Alert.alert(
             t('auth.logout'),
-            'Are you sure you want to logout?',
+            t('profile.logoutConfirm'),
             [
                 { text: t('common.cancel'), style: 'cancel' },
                 { text: t('auth.logout'), style: 'destructive', onPress: logout },
@@ -135,7 +135,11 @@ export function ProfileScreen() {
             </View>
             <View style={styles.menuRight}>
                 {value && (
-                    <Text style={[styles.menuValue, { color: colors.textSecondary }]}>
+                    <Text
+                        style={[styles.menuValue, { color: colors.textSecondary }]}
+                        numberOfLines={2}
+                        ellipsizeMode="tail"
+                    >
                         {value}
                     </Text>
                 )}
@@ -160,7 +164,10 @@ export function ProfileScreen() {
                     <Text style={[styles.userName, { color: colors.text }]}>
                         {user?.role?.toUpperCase() === 'DOCTOR' ? 'Dr. ' : ''}{user?.full_name || 'User'}
                     </Text>
-                    <Text style={[styles.userEmail, { color: colors.textSecondary }]}>
+                    <Text
+                        style={[styles.userEmail, { color: colors.textSecondary }]}
+                        selectable
+                    >
                         {user?.email}
                     </Text>
                     <View style={[styles.roleBadge, { backgroundColor: colors.primary + '20' }]}>
@@ -204,7 +211,7 @@ export function ProfileScreen() {
                     {user?.role?.toUpperCase() === 'PATIENT' && (
                         <MenuItem
                             icon="star-outline"
-                            label="My Ratings"
+                            label={t('profile.myRatings')}
                             onPress={() => navigation.navigate('MyRatings')}
                         />
                     )}
@@ -241,22 +248,21 @@ export function ProfileScreen() {
                     />
                 </Card>
 
-                {/* Support */}
                 <Card style={styles.section}>
-                    <Text style={[styles.sectionTitle, { color: colors.text }]}>Support</Text>
+                    <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('profile.support')}</Text>
                     <MenuItem
                         icon="help-circle-outline"
-                        label="Help Center"
+                        label={t('profile.helpCenter')}
                         onPress={() => Linking.openURL('https://clinic-web-app-two.vercel.app/help')}
                     />
                     <MenuItem
                         icon="document-text-outline"
-                        label="Privacy Policy"
+                        label={t('profile.privacyPolicy')}
                         onPress={() => Linking.openURL('https://clinic-web-app-two.vercel.app/privacy')}
                     />
                     <MenuItem
                         icon="shield-checkmark-outline"
-                        label="Terms of Service"
+                        label={t('profile.termsOfService')}
                         onPress={() => Linking.openURL('https://clinic-web-app-two.vercel.app/terms')}
                     />
                 </Card>
@@ -296,11 +302,11 @@ export function ProfileScreen() {
 
                         <View style={styles.modalBody}>
                             <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>
-                                Current Password
+                                {t('profile.currentPassword')}
                             </Text>
                             <TextInput
                                 style={[styles.textInput, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
-                                placeholder="Enter current password"
+                                placeholder={t('profile.enterCurrentPassword')}
                                 placeholderTextColor={colors.textMuted}
                                 secureTextEntry
                                 value={currentPassword}
@@ -308,11 +314,11 @@ export function ProfileScreen() {
                             />
 
                             <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>
-                                New Password
+                                {t('profile.newPassword')}
                             </Text>
                             <TextInput
                                 style={[styles.textInput, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
-                                placeholder="Enter new password"
+                                placeholder={t('profile.enterNewPassword')}
                                 placeholderTextColor={colors.textMuted}
                                 secureTextEntry
                                 value={newPassword}
@@ -320,11 +326,11 @@ export function ProfileScreen() {
                             />
 
                             <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>
-                                Confirm New Password
+                                {t('profile.confirmPasswordLabel')}
                             </Text>
                             <TextInput
                                 style={[styles.textInput, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
-                                placeholder="Confirm new password"
+                                placeholder={t('profile.confirmNewPassword')}
                                 placeholderTextColor={colors.textMuted}
                                 secureTextEntry
                                 value={confirmPassword}
@@ -334,13 +340,13 @@ export function ProfileScreen() {
 
                         <View style={styles.modalActions}>
                             <Button
-                                title="Cancel"
+                                title={t('common.cancel')}
                                 onPress={() => setShowPasswordModal(false)}
                                 variant="outline"
                                 style={{ flex: 1, marginRight: spacing.sm }}
                             />
                             <Button
-                                title={isChangingPassword ? "Changing..." : "Change Password"}
+                                title={isChangingPassword ? t('profile.changing') : t('profile.changePassword')}
                                 onPress={handleChangePassword}
                                 disabled={isChangingPassword}
                                 style={{ flex: 1, marginLeft: spacing.sm }}
@@ -361,7 +367,7 @@ export function ProfileScreen() {
                     <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
                         <View style={styles.modalHeader}>
                             <Text style={[styles.modalTitle, { color: colors.text }]}>
-                                Edit Profile
+                                {t('profile.editProfile')}
                             </Text>
                             <TouchableOpacity onPress={() => setShowEditProfileModal(false)}>
                                 <Ionicons name="close" size={24} color={colors.text} />
@@ -370,22 +376,22 @@ export function ProfileScreen() {
 
                         <View style={styles.modalBody}>
                             <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>
-                                Full Name
+                                {t('auth.fullName')}
                             </Text>
                             <TextInput
                                 style={[styles.textInput, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
-                                placeholder="Enter your full name"
+                                placeholder={t('profile.enterName')}
                                 placeholderTextColor={colors.textMuted}
                                 value={editName}
                                 onChangeText={setEditName}
                             />
 
                             <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>
-                                Phone Number
+                                {t('auth.phone')}
                             </Text>
                             <TextInput
                                 style={[styles.textInput, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
-                                placeholder="Enter your phone number"
+                                placeholder={t('profile.enterPhone')}
                                 placeholderTextColor={colors.textMuted}
                                 value={editPhone}
                                 onChangeText={setEditPhone}
@@ -395,13 +401,13 @@ export function ProfileScreen() {
 
                         <View style={styles.modalActions}>
                             <Button
-                                title="Cancel"
+                                title={t('common.cancel')}
                                 onPress={() => setShowEditProfileModal(false)}
                                 variant="outline"
                                 style={{ flex: 1, marginRight: spacing.sm }}
                             />
                             <Button
-                                title={isSavingProfile ? "Saving..." : "Save Changes"}
+                                title={isSavingProfile ? t('profile.saving') : t('profile.saveChanges')}
                                 onPress={handleSaveProfile}
                                 disabled={isSavingProfile}
                                 style={{ flex: 1, marginLeft: spacing.sm }}
@@ -443,8 +449,10 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     userEmail: {
-        fontSize: 14,
+        fontSize: 13,
         marginTop: spacing.xs,
+        textAlign: 'center',
+        paddingHorizontal: spacing.md,
     },
     roleBadge: {
         paddingHorizontal: spacing.md,
@@ -497,9 +505,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: spacing.sm,
+        flex: 1,
+        justifyContent: 'flex-end',
+        marginLeft: spacing.sm,
     },
     menuValue: {
         fontSize: 14,
+        textAlign: 'right',
+        flexShrink: 1,
     },
     logoutButton: {
         marginTop: spacing.md,

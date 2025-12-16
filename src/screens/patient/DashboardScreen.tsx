@@ -177,11 +177,11 @@ export function PatientDashboard() {
                     ratedAppointmentIds.has(appointment.id) ? (
                         <View style={[styles.ratedBadge, { backgroundColor: colors.success + '20' }]}>
                             <Ionicons name="checkmark-circle" size={16} color={colors.success} />
-                            <Text style={[styles.ratedText, { color: colors.success }]}>Rated</Text>
+                            <Text style={[styles.ratedText, { color: colors.success }]}>{t('dashboard.rated')}</Text>
                         </View>
                     ) : (
                         <Button
-                            title="⭐ Rate Doctor"
+                            title={`⭐ ${t('dashboard.rateDoctor')}`}
                             onPress={() => navigation.navigate('RateDoctor', {
                                 appointmentId: appointment.id,
                                 doctorId: doctor?.id || doctor?._id,

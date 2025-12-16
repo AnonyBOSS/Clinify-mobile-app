@@ -43,6 +43,7 @@ export interface ScheduleDay {
     startTime: string;
     endTime: string;
     slotDurationMinutes: number;
+    isActive?: boolean;
 }
 
 // Clinic & Slot types

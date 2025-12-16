@@ -109,10 +109,10 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
 
             const result = await register(data);
             if (!result.success) {
-                Alert.alert('Error', result.error || 'Registration failed');
+                Alert.alert(t('common.error'), result.error || t('auth.registerFailed'));
             }
         } catch (error) {
-            Alert.alert('Error', t('errors.networkError'));
+            Alert.alert(t('common.error'), t('errors.networkError'));
         } finally {
             setLoading(false);
         }

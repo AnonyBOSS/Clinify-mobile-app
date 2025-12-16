@@ -137,7 +137,7 @@ export function DoctorSearchScreen() {
                         <Text style={[styles.ratingText, { color: colors.textMuted }]}>
                             {(doctorRatings[doctor.id]?.count || 0) > 0
                                 ? `(${doctorRatings[doctor.id]?.count} ${t('doctors.reviews')})`
-                                : 'No reviews yet'}
+                                : t('doctors.noReviews')}
                         </Text>
                     </View>
                 </View>
@@ -240,7 +240,7 @@ export function DoctorSearchScreen() {
                     <EmptyState
                         icon="search-outline"
                         title={t('common.noResults')}
-                        message="Try adjusting your search or filters"
+                        message={t('doctors.tryAdjusting')}
                     />
                 }
             />

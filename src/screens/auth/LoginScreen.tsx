@@ -59,10 +59,10 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
         try {
             const result = await login({ email, password, role });
             if (!result.success) {
-                Alert.alert('Error', result.error || t('auth.invalidCredentials'));
+                Alert.alert(t('common.error'), result.error || t('auth.invalidCredentials'));
             }
         } catch (error) {
-            Alert.alert('Error', t('errors.networkError'));
+            Alert.alert(t('common.error'), t('errors.networkError'));
         } finally {
             setLoading(false);
         }

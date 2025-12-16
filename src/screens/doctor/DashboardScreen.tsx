@@ -96,21 +96,21 @@ export function DoctorDashboard() {
                         <Text style={[styles.statNumber, { color: colors.primary }]}>
                             {summary?.totalAppointments || 0}
                         </Text>
-                        <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Total</Text>
+                        <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{t('dashboard.total')}</Text>
                     </Card>
                     <Card style={[styles.statCard, { backgroundColor: colors.success + '15' }]}>
                         <Ionicons name="checkmark-circle" size={24} color={colors.success} />
                         <Text style={[styles.statNumber, { color: colors.success }]}>
                             {summary?.completedAppointments || 0}
                         </Text>
-                        <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Completed</Text>
+                        <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{t('dashboard.completed')}</Text>
                     </Card>
                     <Card style={[styles.statCard, { backgroundColor: colors.info + '15' }]}>
                         <Ionicons name="time" size={24} color={colors.info} />
                         <Text style={[styles.statNumber, { color: colors.info }]}>
                             {summary?.upcomingCount || 0}
                         </Text>
-                        <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Upcoming</Text>
+                        <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{t('dashboard.upcoming')}</Text>
                     </Card>
                 </View>
 
@@ -124,7 +124,7 @@ export function DoctorDashboard() {
                                     ${summary?.totalRevenue || 0}
                                 </Text>
                                 <Text style={[styles.wideStatLabel, { color: colors.textSecondary }]}>
-                                    Total Revenue
+                                    {t('dashboard.totalRevenue')}
                                 </Text>
                             </View>
                         </View>
@@ -137,7 +137,7 @@ export function DoctorDashboard() {
                                     {summary?.avgRating || 0} ★
                                 </Text>
                                 <Text style={[styles.wideStatLabel, { color: colors.textSecondary }]}>
-                                    Rating ({summary?.totalRatings || 0})
+                                    {t('dashboard.rating')} ({summary?.totalRatings || 0})
                                 </Text>
                             </View>
                         </View>
@@ -149,22 +149,21 @@ export function DoctorDashboard() {
                     <View style={styles.slotsHeader}>
                         <Ionicons name="calendar-outline" size={20} color={colors.primary} />
                         <Text style={[styles.slotsTitle, { color: colors.text }]}>
-                            Available Slots
+                            {t('dashboard.availableSlots')}
                         </Text>
                     </View>
                     <Text style={[styles.slotsNumber, { color: colors.primary }]}>
                         {summary?.availableSlots || 0}
                     </Text>
                     <Text style={[styles.slotsSubtitle, { color: colors.textSecondary }]}>
-                        open slots for booking
+                        {t('dashboard.openSlotsBooking')}
                     </Text>
                 </Card>
 
-                {/* Upcoming Week */}
                 {analytics?.upcomingStats && analytics.upcomingStats.length > 0 && (
                     <View style={styles.section}>
                         <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                            Next 7 Days
+                            {t('dashboard.next7Days')}
                         </Text>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                             <View style={styles.weekContainer}>
@@ -192,7 +191,7 @@ export function DoctorDashboard() {
                 {/* Upcoming Appointments */}
                 <View style={styles.section}>
                     <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                        Upcoming Appointments
+                        {t('dashboard.upcomingAppointments')}
                     </Text>
 
                     {analytics?.upcomingAppointments && analytics.upcomingAppointments.length > 0 ? (
@@ -236,17 +235,16 @@ export function DoctorDashboard() {
                         <Card style={styles.emptyCard}>
                             <Ionicons name="calendar-outline" size={40} color={colors.textMuted} />
                             <Text style={[styles.emptyText, { color: colors.textMuted }]}>
-                                No upcoming appointments
+                                {t('dashboard.noUpcomingAppointments')}
                             </Text>
                         </Card>
                     )}
                 </View>
 
-                {/* Busy Hours */}
                 {analytics?.busyHours && analytics.busyHours.length > 0 && (
                     <View style={styles.section}>
                         <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                            Popular Hours
+                            {t('dashboard.popularHours')}
                         </Text>
                         <Card style={styles.busyHoursCard}>
                             {analytics.busyHours.slice(0, 5).map((hour, index) => (

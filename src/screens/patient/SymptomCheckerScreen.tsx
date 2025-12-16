@@ -28,7 +28,7 @@ export function SymptomCheckerScreen() {
 
     const handleAnalyze = async () => {
         if (!symptoms.trim()) {
-            Alert.alert('Error', 'Please describe your symptoms');
+            Alert.alert(t('common.error'), t('ai.pleaseDescribe'));
             return;
         }
 
@@ -37,7 +37,7 @@ export function SymptomCheckerScreen() {
             const response = await aiApi.checkSymptoms(symptoms);
             setResult(response);
         } catch (error) {
-            Alert.alert('Error', 'Failed to analyze symptoms. Please try again.');
+            Alert.alert(t('common.error'), t('ai.failedToAnalyze'));
         } finally {
             setLoading(false);
         }
@@ -135,12 +135,11 @@ export function SymptomCheckerScreen() {
                             </View>
                         </Card>
 
-                        {/* Summary */}
                         <Card style={styles.resultCard}>
                             <View style={styles.resultHeader}>
                                 <Ionicons name="document-text" size={24} color={colors.primary} />
                                 <Text style={[styles.resultTitle, { color: colors.text }]}>
-                                    Summary
+                                    {t('ai.summary')}
                                 </Text>
                             </View>
                             <Text style={[styles.resultText, { color: colors.textSecondary }]}>
@@ -154,7 +153,7 @@ export function SymptomCheckerScreen() {
                                 <View style={styles.resultHeader}>
                                     <Ionicons name="fitness" size={24} color={colors.warning} />
                                     <Text style={[styles.resultTitle, { color: colors.text }]}>
-                                        Possible Conditions
+                                        {t('ai.possibleConditions')}
                                     </Text>
                                 </View>
                                 {result.possibleConditions.map((condition, index) => (
@@ -173,7 +172,7 @@ export function SymptomCheckerScreen() {
                             <View style={styles.resultHeader}>
                                 <Ionicons name="analytics" size={24} color={colors.info} />
                                 <Text style={[styles.resultTitle, { color: colors.text }]}>
-                                    Detailed Analysis
+                                    {t('ai.detailedAnalysis')}
                                 </Text>
                             </View>
                             <Text style={[styles.resultText, { color: colors.textSecondary }]}>
@@ -187,7 +186,7 @@ export function SymptomCheckerScreen() {
                                 <View style={styles.resultHeader}>
                                     <Ionicons name="heart" size={24} color={colors.success} />
                                     <Text style={[styles.resultTitle, { color: colors.text }]}>
-                                        Self Care Advice
+                                        {t('ai.selfCareAdvice')}
                                     </Text>
                                 </View>
                                 {result.selfCareAdvice.map((advice, index) => (
@@ -207,7 +206,7 @@ export function SymptomCheckerScreen() {
                                 <View style={styles.resultHeader}>
                                     <Ionicons name="warning" size={24} color={colors.error} />
                                     <Text style={[styles.resultTitle, { color: colors.text }]}>
-                                        Warning Signs to Watch
+                                        {t('ai.warningSignsToWatch')}
                                     </Text>
                                 </View>
                                 {result.warningSignsToWatch.map((warning, index) => (
@@ -243,7 +242,7 @@ export function SymptomCheckerScreen() {
                                     ))}
                                 </View>
                                 <Button
-                                    title="Find Doctors"
+                                    title={t('ai.findDoctors')}
                                     onPress={() => {
                                         // Navigate to Search which is in the tabs
                                         const parentNav = navigation.getParent() || navigation;

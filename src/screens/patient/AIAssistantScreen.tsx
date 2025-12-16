@@ -54,7 +54,7 @@ export function AIAssistantScreen() {
         } catch (error) {
             const errorMessage: AIMessage = {
                 role: 'assistant',
-                content: 'Sorry, I encountered an error. Please try again.',
+                content: t('ai.aiError'),
                 timestamp: new Date().toISOString(),
             };
             setMessages((prev) => [...prev, errorMessage]);
@@ -63,11 +63,11 @@ export function AIAssistantScreen() {
         }
     };
 
-    const quickQuestions = [
-        'What are common cold symptoms?',
-        'How to reduce fever naturally?',
-        'When should I see a doctor?',
-        'Tips for better sleep',
+    const getQuickQuestions = () => [
+        t('ai.q1'),
+        t('ai.q2'),
+        t('ai.q3'),
+        t('ai.q4'),
     ];
 
     return (
@@ -97,7 +97,7 @@ export function AIAssistantScreen() {
                                 <Ionicons name="chatbubble-ellipses" size={40} color={colors.primary} />
                             </View>
                             <Text style={[styles.welcomeTitle, { color: colors.text }]}>
-                                AI Medical Assistant
+                                {t('ai.medicalAssistant')}
                             </Text>
                             <Text style={[styles.welcomeText, { color: colors.textSecondary }]}>
                                 {t('ai.disclaimer')}
@@ -105,9 +105,9 @@ export function AIAssistantScreen() {
 
                             {/* Quick Questions */}
                             <Text style={[styles.quickTitle, { color: colors.text }]}>
-                                Quick Questions
+                                {t('ai.quickQuestions')}
                             </Text>
-                            {quickQuestions.map((question, index) => (
+                            {getQuickQuestions().map((question, index) => (
                                 <TouchableOpacity
                                     key={index}
                                     style={[styles.quickQuestion, { backgroundColor: colors.surface }]}

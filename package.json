@@ -11,6 +11,7 @@
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
     "@react-native-async-storage/async-storage": "^2.2.0",
+    "@react-native-picker/picker": "^2.11.4",
     "@react-navigation/bottom-tabs": "^7.8.12",
     "@react-navigation/native": "^7.1.25",
     "@react-navigation/native-stack": "^7.8.6",
@@ -19,6 +20,7 @@
     "expo-localization": "^17.0.8",
     "expo-secure-store": "^15.0.8",
     "expo-status-bar": "~3.0.9",
+    "expo-updates": "~29.0.15",
     "i18n-js": "^4.5.1",
     "react": "19.1.0",
     "react-native": "0.81.5",

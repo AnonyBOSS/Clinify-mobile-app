@@ -49,30 +49,26 @@ export const doctorsApi = {
     },
 
     // Get doctor schedule (for doctors)
-    getSchedule: async (): Promise<{ schedule: ScheduleDay[], clinics?: any[], rooms?: any[] }> => {
+    getSchedule: async (): Promise<{ schedule: ScheduleDay[], clinics?: any[], rooms?: any[], consultationFee?: number }> => {
         const response = await apiClient.get('/api/doctors/schedule');
         const data = response.data.data || {};
         return {
             schedule: data.schedule_days || [],
             clinics: data.clinics || [],
-            rooms: data.rooms || []
+            rooms: data.rooms || [],
+            consultationFee: data.consultationFee,
         };
     },
 
     // Update doctor schedule
-    updateSchedule: async (schedule: ScheduleDay[]): Promise<{ success: boolean }> => {
-        const response = await apiClient.put('/api/doctors/schedule', { schedule });
+    updateSchedule: async (scheduleDays: any[], consultationFee: number): Promise<{ success: boolean }> => {
+        const response = await apiClient.put('/api/doctors/schedule', { scheduleDays, consultationFee });
         return response.data;
     },
 
-    // Generate slots
-    generateSlots: async (data: {
-        clinicId: string;
-        roomId: string;
-        startDate: string;
-        endDate: string;
-    }): Promise<{ slots: Slot[] }> => {
-        const response = await apiClient.post('/api/doctors/slots', data);
-        return { slots: response.data.data || [] };
+    // Generate slots for the next 2 weeks based on schedule
+    generateSlots: async (): Promise<{ createdCount: number }> => {
+        const response = await apiClient.post('/api/doctors/slots/generate', {});
+        return response.data.data || { createdCount: 0 };
     },
 };
