@@ -70,7 +70,6 @@ export function MyRatingsScreen() {
             setShowEditModal(false);
             fetchRatings();
         } catch (error: any) {
-            console.error('Update rating error:', error.response?.data || error);
             const message = error.response?.data?.error || 'Failed to update rating';
             Alert.alert('Error', message);
         } finally {
@@ -94,7 +93,6 @@ export function MyRatingsScreen() {
                             Alert.alert('Success', 'Rating deleted successfully');
                             fetchRatings();
                         } catch (error: any) {
-                            console.error('Delete rating error:', error.response?.data || error);
                             const message = error.response?.data?.error || 'Failed to delete rating';
                             Alert.alert('Error', message);
                         }

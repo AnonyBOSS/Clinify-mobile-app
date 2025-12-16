@@ -50,8 +50,11 @@ export function DoctorSearchScreen() {
             await Promise.all(
                 fetchedDoctors.map(async (doc) => {
                     try {
-                        const { averageRating, totalRatings } = await ratingsApi.getDoctorRatings(doc.id);
-                        ratingsMap[doc.id] = { average: averageRating || 0, count: totalRatings || 0 };
+                        const result = await ratingsApi.getDoctorRatings(doc.id);
+                        ratingsMap[doc.id] = {
+                            average: result?.averageRating || 0,
+                            count: result?.totalRatings || 0
+                        };
                     } catch {
                         ratingsMap[doc.id] = { average: 0, count: 0 };
                     }

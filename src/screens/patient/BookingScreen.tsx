@@ -107,8 +107,6 @@ export function BookingScreen() {
                 { text: 'OK', onPress: () => navigation.goBack() },
             ]);
         } catch (error: any) {
-            console.error('Booking error:', error);
-            console.error('Booking error response:', error.response?.data);
             const message = error.response?.data?.error || error.response?.data?.message || 'Booking failed';
             Alert.alert('Error', message);
         } finally {
