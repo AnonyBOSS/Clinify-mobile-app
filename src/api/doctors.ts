@@ -1,17 +1,27 @@
 import apiClient from './client';
 import { Doctor, Slot, ScheduleDay } from '../types';
 
+// Normalize doctor from backend (maps _id to id and ensures rating fields)
+const normalizeDoctor = (doc: any): Doctor => ({
+    ...doc,
+    id: doc._id || doc.id,
+    average_rating: doc.averageRating ?? doc.average_rating ?? 0,
+    total_ratings: doc.totalRatings ?? doc.total_ratings ?? 0,
+});
+
 export const doctorsApi = {
     // Get all doctors
     getDoctors: async (): Promise<{ doctors: Doctor[] }> => {
         const response = await apiClient.get('/api/doctors');
-        return { doctors: response.data.data || [] };
+        const rawDoctors = response.data.data || [];
+        return { doctors: rawDoctors.map(normalizeDoctor) };
     },
 
     // Get doctor by ID
     getDoctor: async (id: string): Promise<{ doctor: Doctor }> => {
         const response = await apiClient.get(`/api/doctors/${id}`);
-        return { doctor: response.data.data };
+        const rawDoctor = response.data.data;
+        return { doctor: rawDoctor ? normalizeDoctor(rawDoctor) : null as any };
     },
 
     // Search doctors by specialization or name
@@ -20,7 +30,8 @@ export const doctorsApi = {
         specialization?: string;
     }): Promise<{ doctors: Doctor[] }> => {
         const response = await apiClient.get('/api/doctors/search', { params });
-        return { doctors: response.data.data || [] };
+        const rawDoctors = response.data.data || [];
+        return { doctors: rawDoctors.map(normalizeDoctor) };
     },
 
     // Get available slots for a doctor
@@ -28,7 +39,13 @@ export const doctorsApi = {
         const params: Record<string, string> = { doctorId };
         if (date) params.date = date;
         const response = await apiClient.get('/api/slots/available', { params });
-        return { slots: response.data.data || [] };
+        // Normalize slots to ensure id field exists
+        const rawSlots = response.data.data || [];
+        const normalizedSlots = rawSlots.map((s: any) => ({
+            ...s,
+            id: s._id || s.id,
+        }));
+        return { slots: normalizedSlots };
     },
 
     // Get doctor schedule (for doctors)

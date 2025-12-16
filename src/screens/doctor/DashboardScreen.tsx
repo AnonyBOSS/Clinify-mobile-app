@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -36,9 +37,12 @@ export function DoctorDashboard() {
         }
     }, []);
 
-    useEffect(() => {
-        fetchAnalytics();
-    }, [fetchAnalytics]);
+    // Auto-refresh when screen comes into focus
+    useFocusEffect(
+        useCallback(() => {
+            fetchAnalytics();
+        }, [fetchAnalytics])
+    );
 
     const onRefresh = () => {
         setRefreshing(true);

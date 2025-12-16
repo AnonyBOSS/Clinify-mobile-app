@@ -43,11 +43,11 @@ export function SymptomCheckerScreen() {
         }
     };
 
-    const getUrgencyColor = (urgency: string) => {
-        switch (urgency) {
-            case 'high':
+    const getUrgencyColor = (urgency?: string) => {
+        switch (urgency?.toUpperCase()) {
+            case 'HIGH':
                 return colors.error;
-            case 'medium':
+            case 'MEDIUM':
                 return colors.warning;
             default:
                 return colors.success;
@@ -115,7 +115,7 @@ export function SymptomCheckerScreen() {
                                 <Ionicons
                                     name="alert-circle"
                                     size={24}
-                                    color={getUrgencyColor(result.urgency)}
+                                    color={getUrgencyColor(result.urgencyLevel)}
                                 />
                                 <Text style={[styles.resultTitle, { color: colors.text }]}>
                                     {t('ai.urgency')}
@@ -124,76 +124,137 @@ export function SymptomCheckerScreen() {
                             <View
                                 style={[
                                     styles.urgencyBadge,
-                                    { backgroundColor: getUrgencyColor(result.urgency) + '20' },
+                                    { backgroundColor: getUrgencyColor(result.urgencyLevel) + '20' },
                                 ]}
                             >
                                 <Text
-                                    style={[styles.urgencyText, { color: getUrgencyColor(result.urgency) }]}
+                                    style={[styles.urgencyText, { color: getUrgencyColor(result.urgencyLevel) }]}
                                 >
-                                    {(result.urgency || 'low').toUpperCase()}
+                                    {result.urgencyLevel || 'LOW'}
                                 </Text>
                             </View>
                         </Card>
 
-                        {/* Analysis */}
+                        {/* Summary */}
                         <Card style={styles.resultCard}>
                             <View style={styles.resultHeader}>
                                 <Ionicons name="document-text" size={24} color={colors.primary} />
                                 <Text style={[styles.resultTitle, { color: colors.text }]}>
-                                    Analysis
+                                    Summary
                                 </Text>
                             </View>
                             <Text style={[styles.resultText, { color: colors.textSecondary }]}>
-                                {result.analysis}
+                                {result.summary}
                             </Text>
                         </Card>
 
-                        {/* Recommendations */}
-                        <Card style={styles.resultCard}>
-                            <View style={styles.resultHeader}>
-                                <Ionicons name="checkmark-circle" size={24} color={colors.success} />
-                                <Text style={[styles.resultTitle, { color: colors.text }]}>
-                                    {t('ai.recommendations')}
-                                </Text>
-                            </View>
-                            {result.recommendations.map((rec, index) => (
-                                <View key={index} style={styles.recommendationItem}>
-                                    <Text style={[styles.bulletPoint, { color: colors.primary }]}>•</Text>
-                                    <Text style={[styles.resultText, { color: colors.textSecondary }]}>
-                                        {rec}
+                        {/* Possible Conditions */}
+                        {result.possibleConditions?.length > 0 && (
+                            <Card style={styles.resultCard}>
+                                <View style={styles.resultHeader}>
+                                    <Ionicons name="fitness" size={24} color={colors.warning} />
+                                    <Text style={[styles.resultTitle, { color: colors.text }]}>
+                                        Possible Conditions
                                     </Text>
                                 </View>
-                            ))}
-                        </Card>
-
-                        {/* Suggested Specialists */}
-                        <Card style={styles.resultCard}>
-                            <View style={styles.resultHeader}>
-                                <Ionicons name="medical" size={24} color={colors.secondary} />
-                                <Text style={[styles.resultTitle, { color: colors.text }]}>
-                                    {t('ai.suggestedSpecialists')}
-                                </Text>
-                            </View>
-                            <View style={styles.specialistTags}>
-                                {result.suggestedSpecializations.map((spec, index) => (
-                                    <View
-                                        key={index}
-                                        style={[styles.specialistTag, { backgroundColor: colors.primary + '20' }]}
-                                    >
-                                        <Text style={[styles.specialistText, { color: colors.primary }]}>
-                                            {spec}
+                                {result.possibleConditions.map((condition, index) => (
+                                    <View key={index} style={styles.listItem}>
+                                        <Text style={[styles.bulletPoint, { color: colors.warning }]}>•</Text>
+                                        <Text style={[styles.resultText, { color: colors.textSecondary }]}>
+                                            {condition}
                                         </Text>
                                     </View>
                                 ))}
+                            </Card>
+                        )}
+
+                        {/* Detailed Analysis */}
+                        <Card style={styles.resultCard}>
+                            <View style={styles.resultHeader}>
+                                <Ionicons name="analytics" size={24} color={colors.info} />
+                                <Text style={[styles.resultTitle, { color: colors.text }]}>
+                                    Detailed Analysis
+                                </Text>
                             </View>
-                            <Button
-                                title="Find Doctors"
-                                onPress={() => navigation.navigate('Search')}
-                                variant="outline"
-                                fullWidth
-                                style={styles.findButton}
-                            />
+                            <Text style={[styles.resultText, { color: colors.textSecondary }]}>
+                                {result.detailedAnalysis}
+                            </Text>
                         </Card>
+
+                        {/* Self Care Advice */}
+                        {result.selfCareAdvice?.length > 0 && (
+                            <Card style={styles.resultCard}>
+                                <View style={styles.resultHeader}>
+                                    <Ionicons name="heart" size={24} color={colors.success} />
+                                    <Text style={[styles.resultTitle, { color: colors.text }]}>
+                                        Self Care Advice
+                                    </Text>
+                                </View>
+                                {result.selfCareAdvice.map((advice, index) => (
+                                    <View key={index} style={styles.listItem}>
+                                        <Text style={[styles.bulletPoint, { color: colors.success }]}>•</Text>
+                                        <Text style={[styles.resultText, { color: colors.textSecondary }]}>
+                                            {advice}
+                                        </Text>
+                                    </View>
+                                ))}
+                            </Card>
+                        )}
+
+                        {/* Warning Signs */}
+                        {result.warningSignsToWatch?.length > 0 && (
+                            <Card style={styles.resultCard}>
+                                <View style={styles.resultHeader}>
+                                    <Ionicons name="warning" size={24} color={colors.error} />
+                                    <Text style={[styles.resultTitle, { color: colors.text }]}>
+                                        Warning Signs to Watch
+                                    </Text>
+                                </View>
+                                {result.warningSignsToWatch.map((warning, index) => (
+                                    <View key={index} style={styles.listItem}>
+                                        <Text style={[styles.bulletPoint, { color: colors.error }]}>•</Text>
+                                        <Text style={[styles.resultText, { color: colors.textSecondary }]}>
+                                            {warning}
+                                        </Text>
+                                    </View>
+                                ))}
+                            </Card>
+                        )}
+
+                        {/* Suggested Specialists */}
+                        {result.suggestedSpecialties?.length > 0 && (
+                            <Card style={styles.resultCard}>
+                                <View style={styles.resultHeader}>
+                                    <Ionicons name="medical" size={24} color={colors.secondary} />
+                                    <Text style={[styles.resultTitle, { color: colors.text }]}>
+                                        {t('ai.suggestedSpecialists')}
+                                    </Text>
+                                </View>
+                                <View style={styles.specialistTags}>
+                                    {result.suggestedSpecialties.map((spec, index) => (
+                                        <View
+                                            key={index}
+                                            style={[styles.specialistTag, { backgroundColor: colors.primary + '20' }]}
+                                        >
+                                            <Text style={[styles.specialistText, { color: colors.primary }]}>
+                                                {spec}
+                                            </Text>
+                                        </View>
+                                    ))}
+                                </View>
+                                <Button
+                                    title="Find Doctors"
+                                    onPress={() => {
+                                        // Navigate to Search which is in the tabs
+                                        const parentNav = navigation.getParent() || navigation;
+                                        parentNav.navigate('Search');
+                                    }}
+                                    variant="outline"
+                                    fullWidth
+                                    style={styles.findButton}
+                                />
+                            </Card>
+                        )}
                     </View>
                 )}
             </ScrollView>
@@ -265,7 +326,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '700',
     },
-    recommendationItem: {
+    listItem: {
         flexDirection: 'row',
         marginBottom: spacing.xs,
         gap: spacing.sm,

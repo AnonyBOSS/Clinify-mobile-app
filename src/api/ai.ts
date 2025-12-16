@@ -5,17 +5,9 @@ export const aiApi = {
     // Symptom check - backend returns { data: { checkId, analysis, recommendedDoctors } }
     checkSymptoms: async (symptoms: string): Promise<SymptomCheckResult> => {
         const response = await apiClient.post('/api/ai/symptom-check', { symptoms });
-        // Debug: log the raw response
-        console.log('SYMPTOM CHECK RAW RESPONSE:', JSON.stringify(response.data, null, 2));
-        // Backend returns analysis object inside data
-        const data = response.data.data;
-        // Map backend analysis format to SymptomCheckResult
-        return {
-            analysis: data.analysis?.possibleConditions || data.analysis?.analysis || 'Analysis not available',
-            recommendations: data.analysis?.recommendations || [],
-            suggestedSpecializations: data.analysis?.suggestedSpecialties || data.analysis?.suggestedSpecializations || [],
-            urgency: data.analysis?.urgency || 'low',
-        };
+        // Backend returns analysis object inside data.analysis
+        const analysis = response.data.data?.analysis;
+        return analysis as SymptomCheckResult;
     },
 
     // Get symptom check history

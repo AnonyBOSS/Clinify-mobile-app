@@ -7,21 +7,94 @@ import {
     Switch,
     TouchableOpacity,
     Alert,
+    Linking,
+    Modal,
+    TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { Card, Button, Input } from '../../components';
+import { profileApi } from '../../api';
 import { spacing, borderRadius } from '../../theme';
 
 export function ProfileScreen() {
     const { colors, isDark, toggleTheme } = useTheme();
     const { language, setLanguage, t } = useLanguage();
-    const { user, logout } = useAuth();
+    const { user, logout, refreshUser } = useAuth();
+    const navigation = useNavigation<any>();
 
     const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [isChangingPassword, setIsChangingPassword] = useState(false);
+    const [editName, setEditName] = useState(user?.full_name || '');
+    const [editPhone, setEditPhone] = useState(user?.phone || '');
+    const [isSavingProfile, setIsSavingProfile] = useState(false);
+
+    const handleChangePassword = async () => {
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            Alert.alert('Error', 'Please fill in all fields');
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            Alert.alert('Error', 'New passwords do not match');
+            return;
+        }
+        if (newPassword.length < 6) {
+            Alert.alert('Error', 'New password must be at least 6 characters');
+            return;
+        }
+
+        setIsChangingPassword(true);
+        try {
+            await profileApi.changePassword({
+                currentPassword,
+                newPassword,
+            });
+            Alert.alert('Success', 'Password changed successfully');
+            setShowPasswordModal(false);
+            setCurrentPassword('');
+            setNewPassword('');
+            setConfirmPassword('');
+        } catch (error: any) {
+            const message = error.response?.data?.error || error.response?.data?.message || 'Failed to change password';
+            Alert.alert('Error', message);
+        } finally {
+            setIsChangingPassword(false);
+        }
+    };
+
+    const handleSaveProfile = async () => {
+        if (!editName.trim()) {
+            Alert.alert('Error', 'Name cannot be empty');
+            return;
+        }
+
+        setIsSavingProfile(true);
+        try {
+            await profileApi.updateProfile({
+                full_name: editName.trim(),
+                phone: editPhone.trim(),
+            });
+            // Refresh user data in context
+            if (refreshUser) {
+                await refreshUser();
+            }
+            Alert.alert('Success', 'Profile updated successfully');
+            setShowEditProfileModal(false);
+        } catch (error: any) {
+            const message = error.response?.data?.error || error.response?.data?.message || 'Failed to update profile';
+            Alert.alert('Error', message);
+        } finally {
+            setIsSavingProfile(false);
+        }
+    };
 
     const handleLogout = () => {
         Alert.alert(
@@ -106,13 +179,21 @@ export function ProfileScreen() {
                         icon="person-outline"
                         label={t('auth.fullName')}
                         value={user?.full_name}
-                        onPress={() => { }}
+                        onPress={() => {
+                            setEditName(user?.full_name || '');
+                            setEditPhone(user?.phone || '');
+                            setShowEditProfileModal(true);
+                        }}
                     />
                     <MenuItem
                         icon="call-outline"
                         label={t('auth.phone')}
                         value={user?.phone}
-                        onPress={() => { }}
+                        onPress={() => {
+                            setEditName(user?.full_name || '');
+                            setEditPhone(user?.phone || '');
+                            setShowEditProfileModal(true);
+                        }}
                     />
                     <MenuItem
                         icon="mail-outline"
@@ -120,6 +201,13 @@ export function ProfileScreen() {
                         value={user?.email}
                         showChevron={false}
                     />
+                    {user?.role?.toUpperCase() === 'PATIENT' && (
+                        <MenuItem
+                            icon="star-outline"
+                            label="My Ratings"
+                            onPress={() => navigation.navigate('MyRatings')}
+                        />
+                    )}
                 </Card>
 
                 {/* Settings */}
@@ -159,17 +247,17 @@ export function ProfileScreen() {
                     <MenuItem
                         icon="help-circle-outline"
                         label="Help Center"
-                        onPress={() => { }}
+                        onPress={() => Linking.openURL('https://clinic-web-app-two.vercel.app/help')}
                     />
                     <MenuItem
                         icon="document-text-outline"
                         label="Privacy Policy"
-                        onPress={() => { }}
+                        onPress={() => Linking.openURL('https://clinic-web-app-two.vercel.app/privacy')}
                     />
                     <MenuItem
                         icon="shield-checkmark-outline"
                         label="Terms of Service"
-                        onPress={() => { }}
+                        onPress={() => Linking.openURL('https://clinic-web-app-two.vercel.app/terms')}
                     />
                 </Card>
 
@@ -187,6 +275,141 @@ export function ProfileScreen() {
                     Version 1.0.0
                 </Text>
             </ScrollView>
+
+            {/* Change Password Modal */}
+            <Modal
+                visible={showPasswordModal}
+                transparent
+                animationType="slide"
+                onRequestClose={() => setShowPasswordModal(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+                        <View style={styles.modalHeader}>
+                            <Text style={[styles.modalTitle, { color: colors.text }]}>
+                                {t('profile.changePassword')}
+                            </Text>
+                            <TouchableOpacity onPress={() => setShowPasswordModal(false)}>
+                                <Ionicons name="close" size={24} color={colors.text} />
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.modalBody}>
+                            <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>
+                                Current Password
+                            </Text>
+                            <TextInput
+                                style={[styles.textInput, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
+                                placeholder="Enter current password"
+                                placeholderTextColor={colors.textMuted}
+                                secureTextEntry
+                                value={currentPassword}
+                                onChangeText={setCurrentPassword}
+                            />
+
+                            <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>
+                                New Password
+                            </Text>
+                            <TextInput
+                                style={[styles.textInput, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
+                                placeholder="Enter new password"
+                                placeholderTextColor={colors.textMuted}
+                                secureTextEntry
+                                value={newPassword}
+                                onChangeText={setNewPassword}
+                            />
+
+                            <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>
+                                Confirm New Password
+                            </Text>
+                            <TextInput
+                                style={[styles.textInput, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
+                                placeholder="Confirm new password"
+                                placeholderTextColor={colors.textMuted}
+                                secureTextEntry
+                                value={confirmPassword}
+                                onChangeText={setConfirmPassword}
+                            />
+                        </View>
+
+                        <View style={styles.modalActions}>
+                            <Button
+                                title="Cancel"
+                                onPress={() => setShowPasswordModal(false)}
+                                variant="outline"
+                                style={{ flex: 1, marginRight: spacing.sm }}
+                            />
+                            <Button
+                                title={isChangingPassword ? "Changing..." : "Change Password"}
+                                onPress={handleChangePassword}
+                                disabled={isChangingPassword}
+                                style={{ flex: 1, marginLeft: spacing.sm }}
+                            />
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* Edit Profile Modal */}
+            <Modal
+                visible={showEditProfileModal}
+                transparent
+                animationType="slide"
+                onRequestClose={() => setShowEditProfileModal(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+                        <View style={styles.modalHeader}>
+                            <Text style={[styles.modalTitle, { color: colors.text }]}>
+                                Edit Profile
+                            </Text>
+                            <TouchableOpacity onPress={() => setShowEditProfileModal(false)}>
+                                <Ionicons name="close" size={24} color={colors.text} />
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.modalBody}>
+                            <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>
+                                Full Name
+                            </Text>
+                            <TextInput
+                                style={[styles.textInput, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
+                                placeholder="Enter your full name"
+                                placeholderTextColor={colors.textMuted}
+                                value={editName}
+                                onChangeText={setEditName}
+                            />
+
+                            <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>
+                                Phone Number
+                            </Text>
+                            <TextInput
+                                style={[styles.textInput, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
+                                placeholder="Enter your phone number"
+                                placeholderTextColor={colors.textMuted}
+                                value={editPhone}
+                                onChangeText={setEditPhone}
+                                keyboardType="phone-pad"
+                            />
+                        </View>
+
+                        <View style={styles.modalActions}>
+                            <Button
+                                title="Cancel"
+                                onPress={() => setShowEditProfileModal(false)}
+                                variant="outline"
+                                style={{ flex: 1, marginRight: spacing.sm }}
+                            />
+                            <Button
+                                title={isSavingProfile ? "Saving..." : "Save Changes"}
+                                onPress={handleSaveProfile}
+                                disabled={isSavingProfile}
+                                style={{ flex: 1, marginLeft: spacing.sm }}
+                            />
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </SafeAreaView>
     );
 }
@@ -286,5 +509,45 @@ const styles = StyleSheet.create({
         fontSize: 12,
         marginTop: spacing.lg,
         marginBottom: spacing.xl,
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: spacing.lg,
+    },
+    modalContent: {
+        width: '100%',
+        maxWidth: 400,
+        borderRadius: borderRadius.lg,
+        padding: spacing.lg,
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: spacing.lg,
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+    },
+    modalBody: {
+        marginBottom: spacing.lg,
+    },
+    inputLabel: {
+        fontSize: 14,
+        marginBottom: spacing.xs,
+        marginTop: spacing.sm,
+    },
+    textInput: {
+        borderWidth: 1,
+        borderRadius: borderRadius.md,
+        padding: spacing.md,
+        fontSize: 16,
+    },
+    modalActions: {
+        flexDirection: 'row',
     },
 });

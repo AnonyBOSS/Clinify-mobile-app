@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { Card, LoadingSpinner, EmptyState } from '../../components';
@@ -38,9 +38,12 @@ export function MessagesScreen() {
         }
     }, []);
 
-    useEffect(() => {
-        fetchConversations();
-    }, [fetchConversations]);
+    // Auto-refresh when screen comes into focus
+    useFocusEffect(
+        useCallback(() => {
+            fetchConversations();
+        }, [fetchConversations])
+    );
 
     const onRefresh = () => {
         setRefreshing(true);

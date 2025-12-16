@@ -9,11 +9,11 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { Card, Button, LoadingSpinner, EmptyState } from '../../components';
-import { doctorsApi } from '../../api';
+import { doctorsApi, ratingsApi } from '../../api';
 import { spacing, borderRadius } from '../../theme';
 import { Doctor } from '../../types';
 
@@ -37,12 +37,27 @@ export function DoctorSearchScreen() {
     const [filteredDoctors, setFilteredDoctors] = useState<Doctor[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedSpecialization, setSelectedSpecialization] = useState('All');
+    const [doctorRatings, setDoctorRatings] = useState<Record<string, { average: number; count: number }>>({});
 
     const fetchDoctors = useCallback(async () => {
         try {
             const { doctors: fetchedDoctors } = await doctorsApi.getDoctors();
             setDoctors(fetchedDoctors);
             setFilteredDoctors(fetchedDoctors);
+
+            // Fetch ratings for each doctor
+            const ratingsMap: Record<string, { average: number; count: number }> = {};
+            await Promise.all(
+                fetchedDoctors.map(async (doc) => {
+                    try {
+                        const { averageRating, totalRatings } = await ratingsApi.getDoctorRatings(doc.id);
+                        ratingsMap[doc.id] = { average: averageRating || 0, count: totalRatings || 0 };
+                    } catch {
+                        ratingsMap[doc.id] = { average: 0, count: 0 };
+                    }
+                })
+            );
+            setDoctorRatings(ratingsMap);
         } catch (error) {
             console.error('Failed to fetch doctors:', error);
         } finally {
@@ -50,9 +65,12 @@ export function DoctorSearchScreen() {
         }
     }, []);
 
-    useEffect(() => {
-        fetchDoctors();
-    }, [fetchDoctors]);
+    // Auto-refresh when screen comes into focus
+    useFocusEffect(
+        useCallback(() => {
+            fetchDoctors();
+        }, [fetchDoctors])
+    );
 
     useEffect(() => {
         let result = doctors;
@@ -111,10 +129,12 @@ export function DoctorSearchScreen() {
                     </Text>
                     <View style={styles.ratingRow}>
                         <View style={styles.stars}>
-                            {renderStars(doctor.average_rating || 0)}
+                            {renderStars(doctorRatings[doctor.id]?.average || 0)}
                         </View>
                         <Text style={[styles.ratingText, { color: colors.textMuted }]}>
-                            ({doctor.total_ratings || 0} {t('doctors.reviews')})
+                            {(doctorRatings[doctor.id]?.count || 0) > 0
+                                ? `(${doctorRatings[doctor.id]?.count} ${t('doctors.reviews')})`
+                                : 'No reviews yet'}
                         </Text>
                     </View>
                 </View>
@@ -140,7 +160,8 @@ export function DoctorSearchScreen() {
                 title={t('appointments.book')}
                 onPress={() => navigation.navigate('Booking', {
                     doctorId: doctor.id,
-                    doctorName: doctor.full_name
+                    doctorName: doctor.full_name,
+                    consultationFee: doctor.consultation_fee || 300,
                 })}
                 fullWidth
                 style={styles.bookButton}

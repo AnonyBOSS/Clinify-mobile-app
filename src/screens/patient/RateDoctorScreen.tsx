@@ -43,8 +43,8 @@ export function RateDoctorScreen() {
 
         setSubmitting(true);
         try {
+            console.log('Submitting rating with:', { appointmentId, rating, review: review.trim() || undefined });
             await ratingsApi.submitRating({
-                doctorId,
                 appointmentId,
                 rating,
                 review: review.trim() || undefined,
@@ -54,9 +54,11 @@ export function RateDoctorScreen() {
                 'Your rating has been submitted successfully.',
                 [{ text: 'OK', onPress: () => navigation.goBack() }]
             );
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to submit rating:', error);
-            Alert.alert('Error', 'Failed to submit rating. Please try again.');
+            console.error('Error response:', error.response?.data);
+            const message = error.response?.data?.error || 'Failed to submit rating. Please try again.';
+            Alert.alert('Error', message);
         } finally {
             setSubmitting(false);
         }

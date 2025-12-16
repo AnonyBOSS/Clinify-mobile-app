@@ -149,10 +149,14 @@ export interface Rating {
 
 // AI types
 export interface SymptomCheckResult {
-    analysis: string;
-    recommendations: string[];
-    suggestedSpecializations: string[];
-    urgency: 'low' | 'medium' | 'high';
+    urgencyLevel: 'LOW' | 'MEDIUM' | 'HIGH';
+    summary: string;
+    detailedAnalysis: string;
+    possibleConditions: string[];
+    suggestedSpecialties: string[];
+    selfCareAdvice: string[];
+    warningSignsToWatch: string[];
+    followUpQuestions: string[];
 }
 
 export interface AIMessage {

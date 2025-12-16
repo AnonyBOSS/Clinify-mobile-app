@@ -15,10 +15,10 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { Card, Button, LoadingSpinner, Header } from '../../components';
 import { doctorsApi, appointmentsApi } from '../../api';
 import { spacing, borderRadius } from '../../theme';
-import { Slot } from '../../types';
+import { Slot, Doctor } from '../../types';
 
 type BookingRouteParams = {
-    Booking: { doctorId: string; doctorName: string };
+    Booking: { doctorId: string; doctorName: string; consultationFee?: number };
 };
 
 export function BookingScreen() {
@@ -26,50 +26,58 @@ export function BookingScreen() {
     const { t } = useLanguage();
     const navigation = useNavigation<any>();
     const route = useRoute<RouteProp<BookingRouteParams, 'Booking'>>();
-    const { doctorId, doctorName } = route.params;
+    const { doctorId, doctorName, consultationFee = 300 } = route.params;
 
     const [loading, setLoading] = useState(true);
     const [booking, setBooking] = useState(false);
-    const [slots, setSlots] = useState<Slot[]>([]);
+    const [allSlots, setAllSlots] = useState<Slot[]>([]);
+    const [filteredSlots, setFilteredSlots] = useState<Slot[]>([]);
     const [selectedDate, setSelectedDate] = useState<string>('');
     const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
     const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card'>('cash');
     const [notes, setNotes] = useState('');
 
-    // Generate next 7 days
-    const getDates = () => {
-        const dates = [];
-        for (let i = 0; i < 7; i++) {
-            const date = new Date();
-            date.setDate(date.getDate() + i);
-            dates.push({
-                date: date.toISOString().split('T')[0],
+    // Get unique dates from all available slots
+    const getAvailableDates = () => {
+        const uniqueDates = [...new Set(allSlots.map(s => s.date))].sort();
+        return uniqueDates.map(dateStr => {
+            const date = new Date(dateStr);
+            return {
+                date: dateStr,
                 day: date.toLocaleDateString('en-US', { weekday: 'short' }),
                 dayNum: date.getDate(),
-            });
-        }
-        return dates;
+            };
+        });
     };
 
-    const dates = getDates();
-
+    // Fetch all available slots on mount
     useEffect(() => {
-        if (dates.length > 0 && !selectedDate) {
-            setSelectedDate(dates[0].date);
-        }
+        fetchAllSlots();
     }, []);
 
+    // Filter slots when date changes
     useEffect(() => {
         if (selectedDate) {
-            fetchSlots();
+            setFilteredSlots(allSlots.filter(s => s.date === selectedDate));
+            setSelectedSlot(null);
+        } else {
+            setFilteredSlots(allSlots);
         }
-    }, [selectedDate]);
+    }, [selectedDate, allSlots]);
 
-    const fetchSlots = async () => {
+    const fetchAllSlots = async () => {
         setLoading(true);
         try {
-            const { slots: fetchedSlots } = await doctorsApi.getAvailableSlots(doctorId, selectedDate);
-            setSlots(fetchedSlots.filter(s => s.status === 'AVAILABLE'));
+            // Fetch slots without date filter to get all available slots
+            const { slots: fetchedSlots } = await doctorsApi.getAvailableSlots(doctorId);
+            const availableSlots = fetchedSlots.filter(s => s.status === 'AVAILABLE');
+            setAllSlots(availableSlots);
+
+            // Auto-select first available date if slots exist
+            if (availableSlots.length > 0) {
+                const firstDate = availableSlots[0].date;
+                setSelectedDate(firstDate);
+            }
         } catch (error) {
             console.error('Failed to fetch slots:', error);
         } finally {
@@ -85,20 +93,24 @@ export function BookingScreen() {
 
         setBooking(true);
         try {
+            // Get clinicId and roomId from slot if available
+            const slotData = selectedSlot as any;
             await appointmentsApi.bookAppointment({
                 doctorId,
+                clinicId: slotData.clinic?._id || slotData.clinic || slotData.clinicId,
+                roomId: slotData.room?._id || slotData.room || slotData.roomId,
                 slotId: selectedSlot.id,
+                method: paymentMethod.toUpperCase() as 'CASH' | 'CARD',
                 notes,
-                payment: {
-                    amount: 300,
-                    method: paymentMethod,
-                },
             });
             Alert.alert('Success', t('appointments.bookingSuccess'), [
                 { text: 'OK', onPress: () => navigation.goBack() },
             ]);
         } catch (error: any) {
-            Alert.alert('Error', error.response?.data?.message || 'Booking failed');
+            console.error('Booking error:', error);
+            console.error('Booking error response:', error.response?.data);
+            const message = error.response?.data?.error || error.response?.data?.message || 'Booking failed';
+            Alert.alert('Error', message);
         } finally {
             setBooking(false);
         }
@@ -124,7 +136,7 @@ export function BookingScreen() {
                                 Dr. {doctorName}
                             </Text>
                             <Text style={[styles.consultFee, { color: colors.textSecondary }]}>
-                                Consultation Fee: $300
+                                Consultation Fee: ${consultationFee}
                             </Text>
                         </View>
                     </View>
@@ -139,7 +151,7 @@ export function BookingScreen() {
                     showsHorizontalScrollIndicator={false}
                     style={styles.dateScroll}
                 >
-                    {dates.map((d) => (
+                    {getAvailableDates().map((d) => (
                         <TouchableOpacity
                             key={d.date}
                             style={[
@@ -180,30 +192,45 @@ export function BookingScreen() {
                 </Text>
                 {loading ? (
                     <LoadingSpinner />
-                ) : slots.length > 0 ? (
+                ) : filteredSlots.length > 0 ? (
                     <View style={styles.slotsGrid}>
-                        {slots.map((slot) => (
-                            <TouchableOpacity
-                                key={slot.id}
-                                style={[
-                                    styles.slotCard,
-                                    {
-                                        backgroundColor: selectedSlot?.id === slot.id ? colors.primary : colors.surface,
-                                        borderColor: colors.primary,
-                                    },
-                                ]}
-                                onPress={() => setSelectedSlot(slot)}
-                            >
-                                <Text
+                        {filteredSlots.map((slot) => {
+                            const slotData = slot as any;
+                            const clinicName = slotData.clinic?.name || slotData.clinicName;
+                            const roomName = slotData.room?.name || slotData.roomName;
+                            return (
+                                <TouchableOpacity
+                                    key={slot.id}
                                     style={[
-                                        styles.slotTime,
-                                        { color: selectedSlot?.id === slot.id ? '#FFFFFF' : colors.text },
+                                        styles.slotCard,
+                                        {
+                                            backgroundColor: selectedSlot?.id === slot.id ? colors.primary : colors.surface,
+                                            borderColor: colors.primary,
+                                        },
                                     ]}
+                                    onPress={() => setSelectedSlot(slot)}
                                 >
-                                    {slot.time}
-                                </Text>
-                            </TouchableOpacity>
-                        ))}
+                                    <Text
+                                        style={[
+                                            styles.slotTime,
+                                            { color: selectedSlot?.id === slot.id ? '#FFFFFF' : colors.text },
+                                        ]}
+                                    >
+                                        {slot.time}
+                                    </Text>
+                                    {(clinicName || roomName) && (
+                                        <Text
+                                            style={[
+                                                styles.slotLocation,
+                                                { color: selectedSlot?.id === slot.id ? '#FFFFFF99' : colors.textMuted },
+                                            ]}
+                                        >
+                                            {clinicName}{roomName ? ` - ${roomName}` : ''}
+                                        </Text>
+                                    )}
+                                </TouchableOpacity>
+                            );
+                        })}
                     </View>
                 ) : (
                     <Card style={styles.noSlots}>
@@ -391,5 +418,10 @@ const styles = StyleSheet.create({
     },
     confirmButton: {
         marginBottom: spacing.xl,
+    },
+    slotLocation: {
+        fontSize: 10,
+        marginTop: 2,
+        textAlign: 'center',
     },
 });

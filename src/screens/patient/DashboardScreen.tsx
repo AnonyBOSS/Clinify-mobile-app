@@ -9,12 +9,12 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { Card, Button, EmptyState, LoadingSpinner } from '../../components';
-import { appointmentsApi } from '../../api';
+import { appointmentsApi, ratingsApi } from '../../api';
 import { spacing, borderRadius } from '../../theme';
 import { Appointment } from '../../types';
 
@@ -29,6 +29,7 @@ export function PatientDashboard() {
     const [todayAppointments, setTodayAppointments] = useState<Appointment[]>([]);
     const [upcomingAppointments, setUpcomingAppointments] = useState<Appointment[]>([]);
     const [pastAppointments, setPastAppointments] = useState<Appointment[]>([]);
+    const [ratedAppointmentIds, setRatedAppointmentIds] = useState<Set<string>>(new Set());
 
     const fetchAppointments = useCallback(async () => {
         try {
@@ -58,6 +59,15 @@ export function PatientDashboard() {
             setTodayAppointments(todayAppts);
             setUpcomingAppointments(upcomingAppts);
             setPastAppointments(pastAppts);
+
+            // Fetch user's ratings to know which appointments are already rated
+            try {
+                const { ratings } = await ratingsApi.getMyRatings();
+                const ratedIds = new Set(ratings.map((r: any) => r.appointment?._id || r.appointment));
+                setRatedAppointmentIds(ratedIds);
+            } catch (err) {
+                // Ignore rating fetch errors
+            }
         } catch (error) {
             console.error('Failed to fetch appointments:', error);
         } finally {
@@ -66,9 +76,12 @@ export function PatientDashboard() {
         }
     }, []);
 
-    useEffect(() => {
-        fetchAppointments();
-    }, [fetchAppointments]);
+    // Auto-refresh when screen comes into focus
+    useFocusEffect(
+        useCallback(() => {
+            fetchAppointments();
+        }, [fetchAppointments])
+    );
 
     const onRefresh = () => {
         setRefreshing(true);
@@ -161,17 +174,24 @@ export function PatientDashboard() {
                 )}
 
                 {appointment.status === 'COMPLETED' && (
-                    <Button
-                        title="⭐ Rate Doctor"
-                        onPress={() => navigation.navigate('RateDoctor', {
-                            appointmentId: appointment.id,
-                            doctorId: doctor?.id || doctor?._id,
-                            doctorName: doctor?.full_name,
-                        })}
-                        variant="primary"
-                        size="small"
-                        style={styles.rateButton}
-                    />
+                    ratedAppointmentIds.has(appointment.id) ? (
+                        <View style={[styles.ratedBadge, { backgroundColor: colors.success + '20' }]}>
+                            <Ionicons name="checkmark-circle" size={16} color={colors.success} />
+                            <Text style={[styles.ratedText, { color: colors.success }]}>Rated</Text>
+                        </View>
+                    ) : (
+                        <Button
+                            title="⭐ Rate Doctor"
+                            onPress={() => navigation.navigate('RateDoctor', {
+                                appointmentId: appointment.id,
+                                doctorId: doctor?.id || doctor?._id,
+                                doctorName: doctor?.full_name,
+                            })}
+                            variant="primary"
+                            size="small"
+                            style={styles.rateButton}
+                        />
+                    )
                 )}
             </Card>
         );
@@ -409,5 +429,18 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         fontSize: 14,
+    },
+    ratedBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: spacing.xs,
+        paddingHorizontal: spacing.md,
+        paddingVertical: spacing.sm,
+        borderRadius: borderRadius.md,
+        marginTop: spacing.md,
+    },
+    ratedText: {
+        fontSize: 14,
+        fontWeight: '600',
     },
 });

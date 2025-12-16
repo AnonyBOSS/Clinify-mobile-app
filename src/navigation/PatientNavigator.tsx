@@ -12,6 +12,7 @@ import {
     SymptomCheckerScreen,
     AIAssistantScreen,
     RateDoctorScreen,
+    MyRatingsScreen,
 } from '../screens/patient';
 import {
     MessagesScreen,
@@ -128,6 +129,7 @@ export function PatientNavigator() {
             <Stack.Screen name="AIAssistant" component={AIAssistantScreen} />
             <Stack.Screen name="Chat" component={ChatScreen} />
             <Stack.Screen name="RateDoctor" component={RateDoctorScreen} />
+            <Stack.Screen name="MyRatings" component={MyRatingsScreen} />
         </Stack.Navigator>
     );
 }
