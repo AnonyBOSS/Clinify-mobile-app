@@ -287,6 +287,7 @@ export const en = {
         q2: 'How to reduce fever naturally?',
         q3: 'When should I see a doctor?',
         q4: 'Tips for better sleep',
+        recommendedDoctors: 'Recommended Doctors',
     },
 
     // Errors

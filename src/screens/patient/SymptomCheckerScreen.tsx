@@ -15,7 +15,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { Card, Button, Header } from '../../components';
 import { aiApi } from '../../api';
 import { spacing, borderRadius } from '../../theme';
-import { SymptomCheckResult } from '../../types';
+import { SymptomCheckResult, Doctor } from '../../types';
 
 export function SymptomCheckerScreen() {
     const { colors } = useTheme();
@@ -25,6 +25,7 @@ export function SymptomCheckerScreen() {
     const [symptoms, setSymptoms] = useState('');
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<SymptomCheckResult | null>(null);
+    const [recommendedDoctors, setRecommendedDoctors] = useState<Doctor[]>([]);
 
     const handleAnalyze = async () => {
         if (!symptoms.trim()) {
@@ -35,7 +36,8 @@ export function SymptomCheckerScreen() {
         setLoading(true);
         try {
             const response = await aiApi.checkSymptoms(symptoms);
-            setResult(response);
+            setResult(response.analysis);
+            setRecommendedDoctors(response.recommendedDoctors || []);
         } catch (error) {
             Alert.alert(t('common.error'), t('ai.failedToAnalyze'));
         } finally {
@@ -241,19 +243,62 @@ export function SymptomCheckerScreen() {
                                         </View>
                                     ))}
                                 </View>
-                                <Button
-                                    title={t('ai.findDoctors')}
-                                    onPress={() => {
-                                        // Navigate to Search which is in the tabs
-                                        const parentNav = navigation.getParent() || navigation;
-                                        parentNav.navigate('Search');
-                                    }}
-                                    variant="outline"
-                                    fullWidth
-                                    style={styles.findButton}
-                                />
                             </Card>
                         )}
+
+                        {/* Recommended Doctors */}
+                        {recommendedDoctors.length > 0 && (
+                            <Card style={styles.resultCard}>
+                                <View style={styles.resultHeader}>
+                                    <Ionicons name="people" size={24} color={colors.primary} />
+                                    <Text style={[styles.resultTitle, { color: colors.text }]}>
+                                        {t('ai.recommendedDoctors')}
+                                    </Text>
+                                </View>
+                                {recommendedDoctors.map((doctor, index) => (
+                                    <View key={doctor.id || index} style={[styles.doctorCard, { borderColor: colors.border }]}>
+                                        <View style={styles.doctorInfo}>
+                                            <View style={[styles.doctorAvatar, { backgroundColor: colors.primary }]}>
+                                                <Text style={styles.doctorInitial}>
+                                                    {doctor.full_name?.charAt(0) || 'D'}
+                                                </Text>
+                                            </View>
+                                            <View style={styles.doctorDetails}>
+                                                <Text style={[styles.doctorName, { color: colors.text }]}>
+                                                    Dr. {doctor.full_name}
+                                                </Text>
+                                                <Text style={[styles.doctorSpecialty, { color: colors.textSecondary }]}>
+                                                    {doctor.specializations?.join(', ') || 'General'}
+                                                </Text>
+                                            </View>
+                                        </View>
+                                        <Button
+                                            title={t('appointments.book')}
+                                            onPress={() => navigation.navigate('Booking', {
+                                                doctorId: doctor.id || (doctor as any)._id,
+                                                doctorName: doctor.full_name,
+                                                consultationFee: doctor.consultation_fee || 300,
+                                            })}
+                                            size="small"
+                                            style={styles.bookBtn}
+                                        />
+                                    </View>
+                                ))}
+                            </Card>
+                        )}
+
+                        {/* Find More Doctors Button */}
+                        <Button
+                            title={t('ai.findDoctors')}
+                            onPress={() => {
+                                const parentNav = navigation.getParent() || navigation;
+                                parentNav.navigate('Search');
+                            }}
+                            variant="outline"
+                            fullWidth
+                            icon={<Ionicons name="search" size={18} color={colors.primary} />}
+                            style={styles.findButton}
+                        />
                     </View>
                 )}
             </ScrollView>
@@ -350,6 +395,45 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
     findButton: {
-        marginTop: spacing.sm,
+        marginTop: spacing.md,
+    },
+    doctorCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: spacing.md,
+        borderBottomWidth: 1,
+    },
+    doctorInfo: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flex: 1,
+    },
+    doctorAvatar: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    doctorInitial: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    doctorDetails: {
+        marginLeft: spacing.sm,
+        flex: 1,
+    },
+    doctorName: {
+        fontSize: 15,
+        fontWeight: '600',
+    },
+    doctorSpecialty: {
+        fontSize: 13,
+        marginTop: 2,
+    },
+    bookBtn: {
+        marginLeft: spacing.sm,
     },
 });

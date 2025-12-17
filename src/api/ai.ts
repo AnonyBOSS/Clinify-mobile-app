@@ -3,11 +3,12 @@ import { SymptomCheckResult, AIMessage, Doctor } from '../types';
 
 export const aiApi = {
     // Symptom check - backend returns { data: { checkId, analysis, recommendedDoctors } }
-    checkSymptoms: async (symptoms: string): Promise<SymptomCheckResult> => {
+    checkSymptoms: async (symptoms: string): Promise<{ analysis: SymptomCheckResult; recommendedDoctors: Doctor[] }> => {
         const response = await apiClient.post('/api/ai/symptom-check', { symptoms });
-        // Backend returns analysis object inside data.analysis
-        const analysis = response.data.data?.analysis;
-        return analysis as SymptomCheckResult;
+        // Backend returns analysis object and recommended doctors
+        const analysis = response.data.data?.analysis as SymptomCheckResult;
+        const recommendedDoctors = response.data.data?.recommendedDoctors || [];
+        return { analysis, recommendedDoctors };
     },
 
     // Get symptom check history
