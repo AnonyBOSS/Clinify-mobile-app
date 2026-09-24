@@ -50,7 +50,7 @@ The app supports both **patients** and **doctors** with role-specific dashboards
 | 📅 **Appointment Booking** | Easy-to-use booking system with time slot selection |
 | 🤖 **AI Health Assistant** | Get personalized health guidance and information |
 | 🩺 **Symptom Checker** | AI-powered symptom analysis with doctor recommendations |
-| 💬 **Messaging** | Real-time chat with healthcare providers |
+| 💬 **Messaging** | Live chat with healthcare providers (polls for new messages every 0.5 s) |
 | ⭐ **Doctor Ratings** | Rate and review your healthcare experience |
 | 📊 **Dashboard** | View upcoming and past appointments at a glance |
 | 🔔 **Notifications** | Stay updated with appointment reminders and messages |
@@ -63,7 +63,7 @@ The app supports both **patients** and **doctors** with role-specific dashboards
 | 📆 **Schedule Management** | Define and manage availability slots |
 | 💬 **Patient Messaging** | Communicate with patients securely |
 | 📈 **Analytics** | View patient statistics and appointment trends |
-| 🔔 **Notifications** | Real-time alerts for new appointments and messages |
+| 🔔 **Notifications** | In-app alerts for new appointments and messages |
 
 ### 🌐 General Features
 
@@ -71,7 +71,7 @@ The app supports both **patients** and **doctors** with role-specific dashboards
 - 🌍 **Multi-language Support** - English and Arabic (RTL) support
 - 🔐 **Secure Authentication** - JWT-based authentication
 - 📱 **Cross-Platform** - iOS and Android support
-- 🔄 **Pull-to-Refresh** - Real-time data synchronization
+- 🔄 **Pull-to-Refresh** - Refresh data on demand
 
 ---
 
